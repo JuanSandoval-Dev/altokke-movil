@@ -10,8 +10,7 @@ import { paletaColores } from "@/paletaColores";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PasajeroVerificacionScreen() {
@@ -26,25 +25,27 @@ export default function PasajeroVerificacionScreen() {
       <BarraNavegacionSuperior titulo="Altokke" />
 
       {/* Evita que el teclado tape al campo */}
-      <KeyboardAwareScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled" //Permite presionar el boton con el teclado en uso
-        enableOnAndroid={true} //Permite subir y bajar, no solo en los iPhones
-        extraScrollHeight={20}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.stepContainer}>
-          <Text style={styles.stepText}>Paso 2 de 3</Text>
-          <IndicadorPasos pasoActual={2} totalPasos={3} />
-        </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled" //Permite presionar el boton con el teclado en uso
+        >
+          <View style={styles.stepContainer}>
+            <Text style={styles.stepText}>Paso 2 de 3</Text>
+            <IndicadorPasos pasoActual={2} totalPasos={3} />
+          </View>
 
-        <View style={styles.headerContainer}>
-          <EncabezadoPagina
-            titulo="Verifica tu "
-            tituloDestacado="información"
-            descripcion="Revisa tus datos y configura tus preferencias de viaje."
-          />
-        </View>
+          <View style={styles.headerContainer}>
+            <EncabezadoPagina
+              titulo="Verifica tu "
+              tituloDestacado="información"
+              descripcion="Revisa tus datos y configura tus preferencias de viaje."
+            />
+          </View>
 
         <View style={styles.card}>
           <Ionicons
@@ -235,7 +236,8 @@ export default function PasajeroVerificacionScreen() {
             <Text style={styles.backButtonText}>Atrás</Text>
           </Pressable>
         </View>
-      </KeyboardAwareScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

@@ -1,7 +1,7 @@
 import { paletaColores } from "@/paletaColores";
 import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 
 interface PropsContenedorPantalla {
   children: React.ReactNode;
@@ -19,16 +19,19 @@ export function ContenedorPantalla({
   return (
     <SafeAreaView style={[estilos.areaSegura, estilo]}>
       {conScroll ? (
-        <KeyboardAwareScrollView
+        <KeyboardAvoidingView
           style={estilos.vistaTeclado}
-          contentContainerStyle={[estilos.contenidoScroll, estiloContenedorContenido]}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          enableOnAndroid={true}
-          extraScrollHeight={20}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
         >
-          {children}
-        </KeyboardAwareScrollView>
+          <ScrollView
+            contentContainerStyle={[estilos.contenidoScroll, estiloContenedorContenido]}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {children}
+          </ScrollView>
+        </KeyboardAvoidingView>
       ) : (
         children
       )}
