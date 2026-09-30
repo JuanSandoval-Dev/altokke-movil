@@ -1,6 +1,11 @@
-import { BotonPrincipal, EncabezadoLogo, TarjetaRol, PiePaginaAutenticacion } from "@/components/ui";
+import {
+  BotonPrincipal,
+  EncabezadoLogo,
+  PiePaginaAutenticacion,
+  TarjetaRol,
+} from "@/components/ui";
 import { paletaColores } from "@/paletaColores";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -54,16 +59,14 @@ export default function CrearCuentaScreen() {
 
         <View style={styles.spacer} />
 
-        <BotonPrincipal
-          titulo="Continuar"
-          alPresionar={handleContinue}
-        />
+        <BotonPrincipal titulo="Continuar" alPresionar={handleContinue} />
 
         <View style={styles.footerContainer}>
           <PiePaginaAutenticacion
             textoPregunta="¿Ya tienes cuenta?"
             ruta={"/login"}
             textoEnlace="Iniciar sesión"
+            mostrarBorde={false}
           />
         </View>
       </View>
