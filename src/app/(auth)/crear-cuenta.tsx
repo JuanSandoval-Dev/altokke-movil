@@ -10,15 +10,13 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+type RolSeleccionado = "pasajero" | "conductor" | null;
+
 export default function CrearCuentaScreen() {
-  // Guardamos qué rol elige el usuario. Los signos < > le dicen a TypeScript que solo puede elegir esas 3 opciones exactas.
-  const [selectedRole, setSelectedRole] = useState<
-    "pasajero" | "conductor" | null
-  >("pasajero");
+  const [selectedRole, setSelectedRole] = useState<RolSeleccionado>("pasajero");
   const router = useRouter();
 
   const handleContinue = () => {
-    // Dependiendo del botón que tocó el usuario, lo mandamos a una ruta u otra
     if (selectedRole === "pasajero") {
       router.push("/registro-pasajero");
     } else if (selectedRole === "conductor") {
@@ -46,20 +44,20 @@ export default function CrearCuentaScreen() {
             subtitulo="Pide mototaxis para ti y tu familia."
             nombreIcono="people-outline"
             seleccionado={selectedRole === "pasajero"}
-            alPresionar={() => setSelectedRole("pasajero")}
+            onPress={() => setSelectedRole("pasajero")}
           />
           <TarjetaRol
             titulo="Cuenta de conductor"
             subtitulo="Regístrate para ofrecer viajes y generar ingresos."
             nombreIcono="car-outline"
             seleccionado={selectedRole === "conductor"}
-            alPresionar={() => setSelectedRole("conductor")}
+            onPress={() => setSelectedRole("conductor")}
           />
         </View>
 
         <View style={styles.spacer} />
 
-        <BotonPrincipal titulo="Continuar" alPresionar={handleContinue} />
+        <BotonPrincipal titulo="Continuar" onPress={handleContinue} />
 
         <View style={styles.footerContainer}>
           <PiePaginaAutenticacion
@@ -97,7 +95,7 @@ const styles = StyleSheet.create({
     color: paletaColores.verde,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: paletaColores.textoSecundario,
     lineHeight: 24,
   },
@@ -108,24 +106,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 32,
-    gap: 12,
-  },
-  footerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: paletaColores.borde,
-    maxWidth: 60,
-  },
-  footerText: {
-    fontSize: 14,
-    color: paletaColores.textoSecundario,
-  },
-  footerLink: {
-    color: paletaColores.verde,
-    fontWeight: "bold",
+    marginTop: 16,
   },
 });

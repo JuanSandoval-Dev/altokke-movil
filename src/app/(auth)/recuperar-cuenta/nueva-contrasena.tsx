@@ -14,8 +14,6 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, View } from "react-native";
 
 export default function NuevoPasswordScreen() {
-  // Ayuda a manejar los datos del formulario fácilmente
-  // yupResolver conecta las validaciones con el formulario
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(esquemaNuevaContrasena),
     defaultValues: {
@@ -46,17 +44,16 @@ export default function NuevoPasswordScreen() {
       </Text>
 
       <View style={styles.formContainer}>
-        {/* Controller conecta nuestro componente visual (CampoTexto) con el estado del formulario */}
         <Controller
           control={control}
           name="password"
           render={({ field: { onChange, value } }) => (
             <CampoTexto
               nombreIcono="lock-closed-outline"
-              textoReferencia="Nueva contraseña"
+              placeholder="Nueva contraseña"
               esPassword
-              valor={value}
-              alCambiarTexto={onChange}
+              value={value}
+              onChangeText={onChange}
             />
           )}
         />
@@ -67,10 +64,10 @@ export default function NuevoPasswordScreen() {
           render={({ field: { onChange, value } }) => (
             <CampoTexto
               nombreIcono="lock-closed-outline"
-              textoReferencia="Confirmar nueva contraseña"
+              placeholder="Confirmar nueva contraseña"
               esPassword
-              valor={value}
-              alCambiarTexto={onChange}
+              value={value}
+              onChangeText={onChange}
             />
           )}
         />
@@ -87,7 +84,7 @@ export default function NuevoPasswordScreen() {
 
         <BotonPrincipal
           titulo="Guardar contraseña"
-          alPresionar={handleSubmit(onSubmit, onError)}
+          onPress={handleSubmit(onSubmit, onError)}
           estilo={styles.submitButton}
         />
       </View>
@@ -161,7 +158,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   requirementText: {
-    fontSize: 14,
+    fontSize: 16,
     color: paletaColores.textoSecundario,
   },
   requirementTextChecked: {

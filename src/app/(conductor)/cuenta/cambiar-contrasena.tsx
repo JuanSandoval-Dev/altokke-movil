@@ -15,14 +15,14 @@ import { paletaColores } from "@/paletaColores";
 
 interface CampoContrasenaProps {
   titulo: string;
-  valor: string;
+  value: string;
   onChangeText: (texto: string) => void;
   placeholder: string;
 }
 
 function CampoContrasena({
   titulo,
-  valor,
+  value,
   onChangeText,
   placeholder,
 }: CampoContrasenaProps) {
@@ -36,7 +36,7 @@ function CampoContrasena({
 
       <View style={styles.inputContainer}>
         <TextInput
-          value={valor}
+          value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor={
@@ -163,21 +163,21 @@ export default function CambiarContrasena() {
           <View style={styles.formulario}>
             <CampoContrasena
               titulo="Contraseña actual"
-              valor={contrasenaActual}
+              value={contrasenaActual}
               onChangeText={setContrasenaActual}
               placeholder="Ingresa tu contraseña actual"
             />
 
             <CampoContrasena
               titulo="Nueva contraseña"
-              valor={nuevaContrasena}
+              value={nuevaContrasena}
               onChangeText={setNuevaContrasena}
               placeholder="Mínimo 8 caracteres"
             />
 
             <CampoContrasena
               titulo="Confirmar nueva contraseña"
-              valor={confirmarContrasena}
+              value={confirmarContrasena}
               onChangeText={setConfirmarContrasena}
               placeholder="Repite la nueva contraseña"
             />

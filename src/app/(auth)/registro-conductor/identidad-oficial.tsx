@@ -124,7 +124,7 @@ export default function IdentidadOficialConductor() {
 
                 <BotonPrincipal
                     titulo="Continuar"
-                    alPresionar={continuar}
+                    onPress={continuar}
                 />
 
                 <Pressable

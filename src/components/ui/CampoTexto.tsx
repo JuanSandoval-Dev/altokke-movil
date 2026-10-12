@@ -10,15 +10,12 @@ import {
   View,
 } from "react-native";
 
-export interface PropsCampoTexto extends Omit<TextInputProps, 'value' | 'onChangeText' | 'placeholder'> {
+export interface PropsCampoTexto extends TextInputProps {
   nombreIcono: keyof typeof Ionicons.glyphMap;
   esPassword?: boolean;
   variante?: "oscuro" | "claro";
   error?: boolean;
   textoError?: string;
-  valor?: string;
-  alCambiarTexto?: (text: string) => void;
-  textoReferencia?: string;
 }
 
 export const CampoTexto = ({
@@ -27,9 +24,6 @@ export const CampoTexto = ({
   variante = "oscuro",
   error,
   textoError,
-  valor,
-  alCambiarTexto,
-  textoReferencia,
   style,
   ...rest
 }: PropsCampoTexto) => {
@@ -51,7 +45,7 @@ export const CampoTexto = ({
         >
           <Ionicons
             name={nombreIcono}
-            size={21}
+            size={24}
             color={error ? "red" : colorSecundario}
           />
 
@@ -63,9 +57,6 @@ export const CampoTexto = ({
             ]}
             placeholderTextColor={colorSecundario}
             secureTextEntry={esPassword ? !visible : rest.secureTextEntry}
-            value={valor}
-            onChangeText={alCambiarTexto}
-            placeholder={textoReferencia}
             {...rest}
           />
           {esPassword && (
@@ -79,7 +70,7 @@ export const CampoTexto = ({
             >
               <Ionicons
                 name={visible ? "eye-outline" : "eye-off-outline"}
-                size={21}
+                size={24}
                 color={colorSecundario}
               />
             </Pressable>
@@ -92,15 +83,13 @@ export const CampoTexto = ({
     );
 };
 
-export default CampoTexto;
-
 const estilos = StyleSheet.create({
   envoltorio: {
     width: "100%",
   },
   contenedor: {
     width: "100%",
-    height: 58,
+    height: 60, // Increased for a11y
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
@@ -120,7 +109,7 @@ const estilos = StyleSheet.create({
   entrada: {
     flex: 1,
     height: "100%",
-    fontSize: 16,
+    fontSize: 18, // Increased for a11y
     color: paletaColores.texto,
   },
   entradaClara: {
@@ -131,7 +120,7 @@ const estilos = StyleSheet.create({
   },
   textoError: {
     color: "red",
-    fontSize: 12,
+    fontSize: 14, // Increased for a11y
     marginTop: 4,
     marginLeft: 8,
   },

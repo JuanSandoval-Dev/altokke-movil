@@ -3,13 +3,13 @@ import { StyleSheet, View } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
 
 export interface PropsCampoCodigoVerificacion {
-  alCambiarTexto?: (texto: string) => void;
+  onChangeText?: (texto: string) => void;
   alLlenar?: (texto: string) => void;
   numeroDigitos?: number;
 }
 
 export function CampoCodigoVerificacion({
-  alCambiarTexto,
+  onChangeText,
   alLlenar,
   numeroDigitos = 6,
 }: PropsCampoCodigoVerificacion) {
@@ -19,7 +19,7 @@ export function CampoCodigoVerificacion({
         numberOfDigits={numeroDigitos}
         focusColor={paletaColores.boton}
         focusStickBlinkingDuration={500}
-        onTextChange={alCambiarTexto}
+        onTextChange={onChangeText}
         onFilled={alLlenar}
         theme={{
           containerStyle: estilos.contenedorOtp,

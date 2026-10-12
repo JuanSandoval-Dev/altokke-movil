@@ -1,13 +1,12 @@
 import {
   BotonPrincipal,
-  BotonRedesSociales,
   CampoTexto,
   ContenedorPantalla,
   EncabezadoLogo,
   EncabezadoPagina,
   PiePaginaAutenticacion,
 } from "@/components/ui";
-import { USUARIOS_DEMO } from "@/constants/usuarios";
+import { BotonRedesSociales } from "@/components/ui/BotonRedesSociales";
 import { useAuth } from "@/context/AuthContext";
 import { paletaColores } from "@/paletaColores";
 import { Link, router } from "expo-router";
@@ -18,6 +17,7 @@ export default function LoginScreen() {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [correoError, setCorreoError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
   const handleLogin = () => {
@@ -30,40 +30,25 @@ export default function LoginScreen() {
       return;
     }
 
-    // Verificar formato de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(correo.trim())) {
       setCorreoError(true);
       return;
     }
 
-    // Esto es solo simulación
-    const usuario = USUARIOS_DEMO.find(
-      (u) =>
-        u.correo.toLowerCase() === correo.trim().toLowerCase() &&
-        u.password === contrasena,
-    );
-
-    if (!usuario) {
-      Alert.alert(
-        "Credenciales incorrectas",
-        "El correo o la contraseña no son correctos.",
-      );
-      return;
-    }
-
-    // Se avisa a toda la app que este usuario hizo login
-    login(usuario.rol as "pasajero" | "conductor");
-
-    if (usuario.rol === "conductor") {
-      router.replace("/inicio");
-      return;
-    }
-
-    if (usuario.rol === "pasajero") {
+    setLoading(true);
+    // Simulo una entrada rapida a la app
+    setTimeout(() => {
+      setLoading(false);
+      login("pasajero");
       router.replace("/mapa");
-      return;
-    }
+    }, 400);
+  };
+
+  const handleGoogleLogin = () => {
+    // Entro directo como pasajero para probar la pantalla
+    login("pasajero");
+    router.replace("/mapa");
   };
 
   return (
@@ -81,27 +66,31 @@ export default function LoginScreen() {
       <View style={styles.formContainer}>
         <CampoTexto
           nombreIcono="mail-outline"
-          textoReferencia="Correo electrónico o teléfono"
+          placeholder="Correo electrónico"
           keyboardType="email-address"
           autoCapitalize="none"
-          valor={correo}
-          alCambiarTexto={setCorreo}
+          value={correo}
+          onChangeText={setCorreo}
           error={correoError}
         />
 
         <CampoTexto
           nombreIcono="lock-closed-outline"
-          textoReferencia="Contraseña"
+          placeholder="Contraseña"
           esPassword
-          valor={contrasena}
-          alCambiarTexto={setContrasena}
+          value={contrasena}
+          onChangeText={setContrasena}
         />
 
         <Link href={"/recuperar-cuenta"} style={styles.forgotPassword}>
           ¿Olvidaste tu contraseña?
         </Link>
 
-        <BotonPrincipal titulo="Entrar" alPresionar={handleLogin} />
+        <BotonPrincipal
+          titulo={loading ? "Entrando..." : "Entrar"}
+          onPress={handleLogin}
+          disabled={loading}
+        />
       </View>
 
       <View style={styles.dividerContainer}>
@@ -115,11 +104,7 @@ export default function LoginScreen() {
           titulo="Continuar con Google"
           nombreIcono="logo-google"
           colorIcono="#EA4335"
-        />
-        <BotonRedesSociales
-          titulo="Continuar con Apple"
-          nombreIcono="logo-apple"
-          colorIcono={paletaColores.texto}
+          onPress={handleGoogleLogin}
         />
       </View>
 
@@ -128,6 +113,7 @@ export default function LoginScreen() {
           textoPregunta="¿No tienes una cuenta?"
           textoEnlace="Crear cuenta"
           ruta={"/crear-cuenta"}
+          mostrarBorde={false}
         />
       </View>
 
@@ -155,7 +141,7 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     color: paletaColores.verde,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "600",
     textAlign: "right",
     alignSelf: "flex-end",
@@ -182,30 +168,14 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 32,
   },
-  socialButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    height: 58,
-    borderWidth: 1,
-    borderColor: paletaColores.borde,
-    borderRadius: 14,
-    backgroundColor: "transparent",
-  },
-  socialButtonText: {
-    color: paletaColores.texto,
-    fontSize: 16,
-    fontWeight: "600",
-  },
   footerContainer: {
     marginTop: "auto",
     marginBottom: 24,
   },
   disclaimerText: {
     color: paletaColores.textoSecundario,
-    fontSize: 12,
+    fontSize: 14,
     textAlign: "center",
-    lineHeight: 18,
+    lineHeight: 20,
   },
 });

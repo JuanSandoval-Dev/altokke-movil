@@ -129,7 +129,7 @@ export default function DocumentosConductor() {
 
                 <BotonPrincipal
                     titulo="Continuar"
-                    alPresionar={continuar}
+                    onPress={continuar}
                 />
                 
                 <Pressable

@@ -30,5 +30,5 @@ export const paletaColores = {
   error: "#D95757",
   advertencia: "#C99738",
   exito: "#319967",
-  deshabilitado: "#55615B",
+  disabled: "#55615B",
 };

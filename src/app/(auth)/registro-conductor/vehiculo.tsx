@@ -1,4 +1,4 @@
-import CampoTexto from "@/components/ui/CampoTexto";
+import { CampoTexto } from "@/components/ui/CampoTexto";
 import { EncabezadoLogo } from "@/components/ui/EncabezadoLogo";
 import { EncabezadoPagina } from "@/components/ui/EncabezadoPagina";
 import BotonPrincipal from "@/components/ui/BotonPrincipal";
@@ -117,52 +117,52 @@ export default function VehiculoConductor() {
         {/* Formulario */}
         <View style={styles.formulario}>
           <CampoTexto
-            textoReferencia="Placa"
+            placeholder="Placa"
             nombreIcono="card-outline"
-            valor={placa}
-            alCambiarTexto={(texto) => setPlaca(texto.toUpperCase())}
+            value={placa}
+            onChangeText={(texto) => setPlaca(texto.toUpperCase())}
             autoCapitalize="characters"
             maxLength={10}
             variante="claro"
           />
           <CampoTexto
-            textoReferencia="Marca"
+            placeholder="Marca"
             nombreIcono="car-outline"
-            valor={marca}
-            alCambiarTexto={setMarca}
+            value={marca}
+            onChangeText={setMarca}
             autoCapitalize="words"
             variante="claro"
           />
           <CampoTexto
-            textoReferencia="Modelo"
+            placeholder="Modelo"
             nombreIcono="settings-outline"
-            valor={modelo}
-            alCambiarTexto={setModelo}
+            value={modelo}
+            onChangeText={setModelo}
             autoCapitalize="words"
             variante="claro"
           />
           <CampoTexto
-            textoReferencia="Año"
+            placeholder="Año"
             nombreIcono="calendar-outline"
-            valor={anio}
-            alCambiarTexto={setAnio}
+            value={anio}
+            onChangeText={setAnio}
             keyboardType="numeric"
             maxLength={4}
             variante="claro"
           />
           <CampoTexto
-            textoReferencia="Color"
+            placeholder="Color"
             nombreIcono="color-palette-outline"
-            valor={color}
-            alCambiarTexto={setColor}
+            value={color}
+            onChangeText={setColor}
             autoCapitalize="words"
             variante="claro"
           />
           <CampoTexto
-            textoReferencia="Capacidad de pasajeros"
+            placeholder="Capacidad de pasajeros"
             nombreIcono="people-outline"
-            valor={capacidad}
-            alCambiarTexto={setCapacidad}
+            value={capacidad}
+            onChangeText={setCapacidad}
             keyboardType="numeric"
             maxLength={1}
             variante="claro"
@@ -198,7 +198,7 @@ export default function VehiculoConductor() {
           texto="Tu cuenta será revisada antes de ser activada."
         />
 
-        <BotonPrincipal titulo="Enviar solicitud" alPresionar={enviarSolicitud} />
+        <BotonPrincipal titulo="Enviar solicitud" onPress={enviarSolicitud} />
 
         <Pressable style={styles.atras} onPress={() => router.back()}>
           <Ionicons

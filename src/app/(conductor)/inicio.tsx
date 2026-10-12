@@ -36,25 +36,25 @@ export default function InicioConductorScreen() {
         <View style={styles.resumenGrid}>
           <ResumenCard
             icono="car-outline"
-            valor={String(RESUMEN_GANANCIAS.viajesCompletadosHoy)}
+            value={String(RESUMEN_GANANCIAS.viajesCompletadosHoy)}
             etiqueta="Viajes hoy"
           />
 
           <ResumenCard
             icono="wallet-outline"
-            valor={`S/ ${RESUMEN_GANANCIAS.totalHoy.toFixed(2)}`}
+            value={`S/ ${RESUMEN_GANANCIAS.totalHoy.toFixed(2)}`}
             etiqueta="Ganancias hoy"
           />
 
           <ResumenCard
             icono="star-outline"
-            valor={String(CONDUCTOR_EJEMPLO.calificacion)}
+            value={String(CONDUCTOR_EJEMPLO.calificacion)}
             etiqueta="Calificación"
           />
 
           <ResumenCard
             icono="time-outline"
-            valor="6 h 20 min"
+            value="6 h 20 min"
             etiqueta="Tiempo en línea"
           />
         </View>
@@ -171,11 +171,11 @@ export default function InicioConductorScreen() {
 
 function ResumenCard({
   icono,
-  valor,
+  value,
   etiqueta,
 }: {
   icono: keyof typeof Ionicons.glyphMap;
-  valor: string;
+  value: string;
   etiqueta: string;
 }) {
   return (
@@ -188,7 +188,7 @@ function ResumenCard({
         />
       </View>
 
-      <Text style={styles.resumenValor}>{valor}</Text>
+      <Text style={styles.resumenValor}>{value}</Text>
       <Text style={styles.resumenLabel}>{etiqueta}</Text>
     </View>
   );

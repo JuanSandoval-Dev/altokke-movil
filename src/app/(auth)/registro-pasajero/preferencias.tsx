@@ -1,25 +1,88 @@
-import { BotonPrincipal, EncabezadoPagina } from "@/components/ui";
-import { BarraNavegacionSuperior } from "@/components/ui/BarraNavegacionSuperior";
+import {
+  BarraNavegacionSuperior,
+  BotonPrincipal,
+  EncabezadoPagina,
+} from "@/components/ui";
+import { useRegistroPasajero } from "@/context/RegistroPasajeroContext";
 import { paletaColores } from "@/paletaColores";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  View,
-} from "react-native";
+import React, { useState } from "react";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+interface OpcionPreferenciaProps {
+  icono: keyof typeof Ionicons.glyphMap;
+  titulo: string;
+  descripcion: string;
+  value: boolean;
+  alCambiar: (valor: boolean) => void;
+}
+
+function OpcionPreferencia({
+  icono,
+  titulo,
+  descripcion,
+  value,
+  alCambiar,
+}: OpcionPreferenciaProps) {
+  return (
+    <Pressable
+      style={[styles.opcionCard, value && { borderColor: paletaColores.boton }]}
+      onPress={() => alCambiar(!value)}
+    >
+      <View style={styles.iconContainer}>
+        <Ionicons
+          name={icono}
+          size={24}
+          color={value ? paletaColores.boton : paletaColores.textoSecundario}
+        />
+      </View>
+      <View style={styles.opcionTextos}>
+        <Text style={styles.opcionTitulo}>{titulo}</Text>
+        <Text style={styles.opcionDescripcion}>{descripcion}</Text>
+      </View>
+      <Ionicons
+        name={value ? "checkmark-circle" : "ellipse-outline"}
+        size={28}
+        color={value ? paletaColores.boton : paletaColores.borde}
+      />
+    </Pressable>
+  );
+}
 
 export default function PasajeroPreferenciasScreen() {
   const [notificaciones, setNotificaciones] = useState(true);
   const [ubicacion, setUbicacion] = useState(true);
-  const [promociones, setPromociones] = useState(true);
+  const [promociones, setPromociones] = useState(false);
   const [terminos, setTerminos] = useState(false);
+  
+  const { datosPersonales, clearRegistro } = useRegistroPasajero();
+  const [loading, setLoading] = useState(false);
+
+  const opciones: OpcionPreferenciaProps[] = [
+    {
+      icono: "notifications-outline",
+      titulo: "Permitir notificaciones",
+      descripcion: "Recibe actualizaciones de tus viajes, alertas y más.",
+      value: notificaciones,
+      alCambiar: setNotificaciones,
+    },
+    {
+      icono: "location-outline",
+      titulo: "Compartir ubicación durante el viaje",
+      descripcion: "Mejora tu seguridad al compartir tu ubicación en tiempo real.",
+      value: ubicacion,
+      alCambiar: setUbicacion,
+    },
+    {
+      icono: "gift-outline",
+      titulo: "Promociones y novedades",
+      descripcion: "Recibe ofertas, descuentos y noticias de Altokke.",
+      value: promociones,
+      alCambiar: setPromociones,
+    }
+  ];
 
   return (
     <SafeAreaView style={styles.pantalla}>
@@ -50,97 +113,19 @@ export default function PasajeroPreferenciasScreen() {
         </View>
 
         <View style={styles.opcionesContainer}>
-          <View style={styles.opcionCard}>
-            <View style={styles.iconContainer}>
-              <Ionicons
-                name="notifications-outline"
-                size={24}
-                color={paletaColores.texto}
-              />
-            </View>
-            <View style={styles.opcionTextos}>
-              <Text style={styles.opcionTitulo}>Permitir notificaciones</Text>
-              <Text style={styles.opcionDescripcion}>
-                Recibe actualizaciones de tus viajes, alertas y más.
-              </Text>
-            </View>
-            <Switch
-              value={notificaciones}
-              onValueChange={setNotificaciones}
-              trackColor={{
-                false: paletaColores.borde,
-                true: paletaColores.boton,
-              }}
-              thumbColor="#ffffff"
-            />
-          </View>
-
-          <View style={styles.opcionCard}>
-            <View style={styles.iconContainer}>
-              <Ionicons
-                name="location-outline"
-                size={24}
-                color={paletaColores.texto}
-              />
-            </View>
-            <View style={styles.opcionTextos}>
-              <Text style={styles.opcionTitulo}>
-                Compartir ubicación durante el viaje
-              </Text>
-              <Text style={styles.opcionDescripcion}>
-                Mejora tu seguridad al compartir tu ubicación en tiempo real.
-              </Text>
-            </View>
-            <Switch
-              value={ubicacion}
-              onValueChange={setUbicacion}
-              trackColor={{
-                false: paletaColores.borde,
-                true: paletaColores.boton,
-              }}
-              thumbColor="#ffffff"
-            />
-          </View>
-
-          <View style={styles.opcionCard}>
-            <View style={styles.iconContainer}>
-              <Ionicons
-                name="gift-outline"
-                size={24}
-                color={paletaColores.texto}
-              />
-            </View>
-            <View style={styles.opcionTextos}>
-              <Text style={styles.opcionTitulo}>Promociones y novedades</Text>
-              <Text style={styles.opcionDescripcion}>
-                Recibe ofertas, descuentos y noticias de Altokke.
-              </Text>
-            </View>
-            <Switch
-              value={promociones}
-              onValueChange={setPromociones}
-              trackColor={{
-                false: paletaColores.borde,
-                true: paletaColores.boton,
-              }}
-              thumbColor="#ffffff"
-            />
-          </View>
+          {opciones.map((opcion, i) => (
+            <OpcionPreferencia key={i} {...opcion} />
+          ))}
         </View>
 
         <View style={styles.infoContainer}>
           <View style={styles.infoIconContainer}>
-            <Ionicons
-              name="shield-checkmark"
-              size={24}
-              color={paletaColores.fondo}
-            />
+            <Ionicons name="shield-checkmark" size={28} color={paletaColores.fondo} />
           </View>
           <View style={styles.infoTextos}>
             <Text style={styles.infoTitulo}>Tu información será protegida</Text>
             <Text style={styles.infoDescripcion}>
-              Cuidamos tus datos y los usamos solo para brindarte un mejor
-              servicio.
+              Cuidamos tus datos y los usamos solo para brindarte un mejor servicio.
             </Text>
           </View>
         </View>
@@ -151,35 +136,44 @@ export default function PasajeroPreferenciasScreen() {
         >
           <Ionicons
             name={terminos ? "checkbox" : "square-outline"}
-            size={24}
-            color={
-              terminos ? paletaColores.boton : paletaColores.textoSecundario
-            }
+            size={28}
+            color={terminos ? paletaColores.boton : paletaColores.textoSecundario}
           />
           <Text style={styles.checkboxText}>
-            Acepto los{" "}
-            <Text style={styles.linkText}>términos y condiciones</Text> y la{" "}
-            <Text style={styles.linkText}>política de privacidad</Text>.
+            Acepto los <Text style={styles.linkText}>términos y condiciones</Text> y la <Text style={styles.linkText}>política de privacidad</Text>.
           </Text>
         </Pressable>
 
         <BotonPrincipal
-          titulo="Crear cuenta"
-          deshabilitado={!terminos}
-          alPresionar={() => {
-            // Asegurar que el usuario acepto los terminos y condiciones.
+          titulo={loading ? "Creando cuenta..." : "Crear cuenta"}
+          disabled={!terminos || loading}
+          onPress={() => {
             if (!terminos) {
+              Alert.alert("Acción requerida", "Debes aceptar los términos y condiciones para continuar.");
+              return;
+            }
+
+            if (
+              !datosPersonales.nombres ||
+              !datosPersonales.apellidos ||
+              !datosPersonales.telefono ||
+              !datosPersonales.dni
+            ) {
               Alert.alert(
-                "Términos incompletos",
-                "Debes aceptar los términos y condiciones para crear tu cuenta.",
+                "Datos incompletos", 
+                "Faltan datos obligatorios. Por favor, regresa a los pasos anteriores y asegúrate de completar tu DNI, teléfono y demás información."
               );
               return;
             }
-            Alert.alert(
-              "Cuenta creada con éxito",
-              "Tus datos han sido registrados exitosamente.",
-            );
-            router.push("/login");
+
+            setLoading(true);
+            // Simulo la creacion de la cuenta en local
+            setTimeout(() => {
+              setLoading(false);
+              Alert.alert("¡Bienvenido a Altokke!", "Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión.");
+              clearRegistro();
+              router.push("/login");
+            }, 500);
           }}
           estilo={styles.botonCrear}
         />
@@ -187,11 +181,7 @@ export default function PasajeroPreferenciasScreen() {
         <View style={styles.separadorContainer}>
           <Pressable
             onPress={() => router.back()}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              width: "100%",
-            }}
+            style={{ flexDirection: "row", alignItems: "center", width: "100%" }}
           >
             <View style={styles.linea} />
             <Text style={styles.textoSeparador}>Atrás</Text>
@@ -204,48 +194,16 @@ export default function PasajeroPreferenciasScreen() {
 }
 
 const styles = StyleSheet.create({
-  pantalla: {
-    flex: 1,
-    backgroundColor: paletaColores.fondo,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 24,
-  },
-  stepContainer: {
-    alignItems: "flex-end",
-    width: 80,
-  },
-  stepText: {
-    fontSize: 13,
-    color: paletaColores.texto,
-    marginBottom: 6,
-    fontWeight: "500",
-  },
-  miniStepIndicator: {
-    flexDirection: "row",
-    gap: 4,
-  },
-  miniStep: {
-    height: 4,
-    width: 20,
-    borderRadius: 2,
-  },
-  stepCompleted: {
-    backgroundColor: paletaColores.boton,
-    opacity: 0.3,
-  },
-  activeStep: {
-    backgroundColor: paletaColores.boton,
-  },
-  pageHeaderContainer: {
-    marginBottom: 24,
-  },
-  opcionesContainer: {
-    gap: 12,
-    marginBottom: 24,
-  },
+  pantalla: { flex: 1, backgroundColor: paletaColores.fondo },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
+  stepContainer: { alignItems: "flex-end", width: 80 },
+  stepText: { fontSize: 15, color: paletaColores.texto, marginBottom: 6, fontWeight: "500" },
+  miniStepIndicator: { flexDirection: "row", gap: 4 },
+  miniStep: { height: 4, width: 20, borderRadius: 2 },
+  stepCompleted: { backgroundColor: paletaColores.boton, opacity: 0.3 },
+  activeStep: { backgroundColor: paletaColores.boton },
+  pageHeaderContainer: { marginBottom: 24 },
+  opcionesContainer: { gap: 16, marginBottom: 24 },
   opcionCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -256,29 +214,17 @@ const styles = StyleSheet.create({
     backgroundColor: paletaColores.fondo,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: paletaColores.input,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,
   },
-  opcionTextos: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  opcionTitulo: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: paletaColores.texto,
-    marginBottom: 4,
-  },
-  opcionDescripcion: {
-    fontSize: 13,
-    color: paletaColores.textoSecundario,
-    lineHeight: 18,
-  },
+  opcionTextos: { flex: 1, paddingRight: 12 },
+  opcionTitulo: { fontSize: 17, fontWeight: "700", color: paletaColores.texto, marginBottom: 6 },
+  opcionDescripcion: { fontSize: 15, color: paletaColores.textoSecundario, lineHeight: 22 },
   infoContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -288,63 +234,22 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   infoIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: paletaColores.boton,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,
   },
-  infoTextos: {
-    flex: 1,
-  },
-  infoTitulo: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: paletaColores.texto,
-    marginBottom: 4,
-  },
-  infoDescripcion: {
-    fontSize: 13,
-    color: paletaColores.textoSecundario,
-    lineHeight: 18,
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  checkboxText: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 14,
-    color: paletaColores.texto,
-    lineHeight: 20,
-  },
-  linkText: {
-    color: paletaColores.verde,
-    textDecorationLine: "underline",
-  },
-  botonCrear: {
-    marginBottom: 24,
-  },
-  separadorContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-  },
-  linea: {
-    flex: 1,
-    height: 1,
-    backgroundColor: paletaColores.borde,
-  },
-  textoSeparador: {
-    fontSize: 15,
-    color: paletaColores.verde,
-    fontWeight: "600",
-    marginHorizontal: 16,
-  },
+  infoTextos: { flex: 1 },
+  infoTitulo: { fontSize: 17, fontWeight: "700", color: paletaColores.texto, marginBottom: 6 },
+  infoDescripcion: { fontSize: 15, color: paletaColores.textoSecundario, lineHeight: 22 },
+  checkboxContainer: { flexDirection: "row", alignItems: "flex-start", marginBottom: 24 },
+  checkboxText: { flex: 1, marginLeft: 12, fontSize: 16, color: paletaColores.texto, lineHeight: 24 },
+  linkText: { color: paletaColores.verde, textDecorationLine: "underline" },
+  botonCrear: { marginBottom: 24 },
+  separadorContainer: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center", paddingHorizontal: 32 },
+  linea: { flex: 1, height: 1, backgroundColor: paletaColores.borde },
+  textoSeparador: { fontSize: 16, color: paletaColores.verde, fontWeight: "600", marginHorizontal: 16 },
 });

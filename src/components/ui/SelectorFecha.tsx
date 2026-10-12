@@ -5,14 +5,14 @@ import { Platform, Pressable, StyleSheet, Text } from "react-native";
 import { paletaColores } from "@/paletaColores";
 
 export interface PropsSelectorFecha {
-  textoReferencia: string;
+  placeholder: string;
   nombreIcono: keyof typeof Ionicons.glyphMap;
   fecha: Date | null;
   alSeleccionar: (fecha: Date) => void;
 }
 
 export function SelectorFecha({
-  textoReferencia,
+  placeholder,
   nombreIcono,
   fecha,
   alSeleccionar,
@@ -42,8 +42,8 @@ export function SelectorFecha({
     <>
       <Pressable style={estilos.contenedor} onPress={() => setMostrar(true)}>
         <Ionicons name={nombreIcono} size={21} color={paletaColores.textoSecundario} />
-        <Text style={[estilos.texto, !fecha && estilos.textoReferencia]}>
-          {fechaFormateada || textoReferencia}
+        <Text style={[estilos.texto, !fecha && estilos.placeholder]}>
+          {fechaFormateada || placeholder}
         </Text>
       </Pressable>
 
@@ -78,7 +78,7 @@ const estilos = StyleSheet.create({
     fontSize: 16,
     color: paletaColores.texto,
   },
-  textoReferencia: {
+  placeholder: {
     color: paletaColores.textoSecundario,
   },
 });

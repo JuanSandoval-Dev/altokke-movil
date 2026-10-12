@@ -12,30 +12,34 @@ import {
 
 export interface PropsBotonPrincipal {
   titulo: string;
-  alPresionar: () => void;
+  onPress?: () => void;
+  alPresionar?: () => void;
   estilo?: StyleProp<ViewStyle>;
   cargando?: boolean;
-  deshabilitado?: boolean;
+  disabled?: boolean;
 }
 
 export function BotonPrincipal({ 
   titulo, 
-  alPresionar, 
+  onPress, 
+  alPresionar,
   estilo,
   cargando,
-  deshabilitado
+  disabled
 }: PropsBotonPrincipal) {
+  const funcionAccion = onPress || alPresionar;
+
   return (
     <Pressable
       style={({ pressed }) => [
         estilos.boton,
         estilo,
-        (deshabilitado || cargando) && estilos.deshabilitado,
-        pressed && !deshabilitado && !cargando && { backgroundColor: paletaColores.botonPresionado },
+        (disabled || cargando) && estilos.disabled,
+        pressed && !disabled && !cargando && { backgroundColor: paletaColores.botonPresionado },
         pressed && estilos.presionado,
       ]}
-      disabled={deshabilitado || cargando}
-      onPress={alPresionar}
+      disabled={disabled || cargando}
+      onPress={funcionAccion}
     >
       {cargando ? (
         <ActivityIndicator color={paletaColores.textoOscuro} />
@@ -70,7 +74,7 @@ const estilos = StyleSheet.create({
     fontWeight: "700", 
     color: paletaColores.textoOscuro, 
   },
-  deshabilitado: {
+  disabled: {
     backgroundColor: "#A0A0A0",
   },
   presionado: { 

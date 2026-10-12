@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useMemo, useCallback } from "react";
 
 type RolUsuario = "pasajero" | "conductor" | null;
 
@@ -23,20 +23,23 @@ export const AuthProvider = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<RolUsuario>(null);
 
-  const login = (rol: RolUsuario) => {
+  const login = useCallback((rol: RolUsuario) => {
     setIsAuthenticated(true);
     setUserRole(rol);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setIsAuthenticated(false);
     setUserRole(null);
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({ isAuthenticated, userRole, login, logout }),
+    [isAuthenticated, userRole, login, logout]
+  );
 
   return (
-    <ContextoAutenticacion.Provider
-      value={{ isAuthenticated, userRole, login, logout }}
-    >
+    <ContextoAutenticacion.Provider value={value}>
       {pantallasHijas}
     </ContextoAutenticacion.Provider>
   );

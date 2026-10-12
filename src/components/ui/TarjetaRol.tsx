@@ -7,7 +7,7 @@ export interface PropsTarjetaRol {
   subtitulo: string;
   nombreIcono: keyof typeof Ionicons.glyphMap;
   seleccionado: boolean;
-  alPresionar: () => void;
+  onPress: () => void;
 }
 
 export function TarjetaRol({
@@ -15,14 +15,15 @@ export function TarjetaRol({
   subtitulo,
   nombreIcono,
   seleccionado,
-  alPresionar,
+  onPress,
 }: PropsTarjetaRol) {
   return (
     <Pressable
-      onPress={alPresionar}
-      style={[
+      onPress={onPress}
+      style={({ pressed }) => [
         estilos.tarjeta,
         seleccionado ? estilos.tarjetaSeleccionada : estilos.tarjetaNoSeleccionada,
+        pressed && estilos.tarjetaPresionada,
       ]}
     >
       <View
@@ -35,8 +36,8 @@ export function TarjetaRol({
       >
         <Ionicons
           name={nombreIcono}
-          size={24}
-          color={seleccionado ? paletaColores.boton : paletaColores.textoSecundario}
+          size={32}
+          color={seleccionado ? paletaColores.textoOscuro : paletaColores.textoSecundario}
         />
       </View>
       <View style={estilos.contenedorTexto}>
@@ -47,13 +48,13 @@ export function TarjetaRol({
         {seleccionado ? (
           <Ionicons
             name="checkmark-circle"
-            size={28}
+            size={32}
             color={paletaColores.boton}
           />
         ) : (
           <Ionicons
             name="ellipse-outline"
-            size={28}
+            size={32}
             color={paletaColores.textoSecundario}
           />
         )}
@@ -66,31 +67,35 @@ const estilos = StyleSheet.create({
   tarjeta: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
+    padding: 24,
     borderRadius: 16,
     borderWidth: 1,
-    marginBottom: 16,
+    marginBottom: 20,
+  },
+  tarjetaPresionada: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   tarjetaSeleccionada: {
     borderColor: paletaColores.boton,
-    backgroundColor: "rgba(53, 233, 130, 0.05)",
+    backgroundColor: paletaColores.tarjeta,
   },
   tarjetaNoSeleccionada: {
     borderColor: paletaColores.borde,
-    backgroundColor: "transparent",
+    backgroundColor: paletaColores.superficie,
   },
   contenedorIcono: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
   },
   contenedorIconoSeleccionado: {
-    backgroundColor: "rgba(53, 233, 130, 0.15)",
+    backgroundColor: paletaColores.boton,
   },
   contenedorIconoNoSeleccionado: {
-    backgroundColor: "rgba(70, 97, 87, 0.2)",
+    backgroundColor: paletaColores.fondo,
   },
   contenedorTexto: {
     flex: 1,
@@ -99,13 +104,14 @@ const estilos = StyleSheet.create({
   },
   titulo: {
     color: paletaColores.texto,
-    fontSize: 16,
+    fontSize: 20, // Increased for accessibility
     fontWeight: "bold",
-    marginBottom: 4,
+    marginBottom: 8,
   },
   subtitulo: {
     color: paletaColores.textoSecundario,
-    fontSize: 14,
+    fontSize: 16, // Increased for accessibility
+    lineHeight: 22,
   },
   contenedorCheck: {
     justifyContent: "center",

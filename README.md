@@ -15,6 +15,7 @@ Actualmente, la solicitud de un mototaxi suele realizarse mediante señas, llama
 La aplicación contempla dos tipos de usuario:
 
 ### 👤 Pasajero
+
 - Crear una cuenta e iniciar sesión.
 - Seleccionar origen y destino.
 - Solicitar un mototaxi.
@@ -26,6 +27,7 @@ La aplicación contempla dos tipos de usuario:
 - Gestionar su cuenta y preferencias.
 
 ### 🛺 Conductor
+
 - Registrarse mediante un proceso de verificación.
 - Registrar información personal.
 - Verificar información de contacto.
@@ -84,15 +86,15 @@ Una vez dentro de la aplicación:
 
 ## 🧰 Tecnologías utilizadas
 
-| Tecnología | Uso |
-|---|---|
-| **React Native** | Desarrollo de la aplicación móvil |
-| **Expo** | Entorno y herramientas de desarrollo |
-| **TypeScript** | Lenguaje principal del proyecto |
-| **Expo Router** | Navegación basada en archivos |
-| **Context API** | Manejo de estado compartido en determinados flujos |
-| **Expo ImagePicker** | Acceso a cámara y selección de imágenes |
-| **Expo DocumentPicker** | Selección de documentos |
+| Tecnología              | Uso                                                |
+| ----------------------- | -------------------------------------------------- |
+| **React Native**        | Desarrollo de la aplicación móvil                  |
+| **Expo**                | Entorno y herramientas de desarrollo               |
+| **TypeScript**          | Lenguaje principal del proyecto                    |
+| **Expo Router**         | Navegación basada en archivos                      |
+| **Context API**         | Manejo de estado compartido en determinados flujos |
+| **Expo ImagePicker**    | Acceso a cámara y selección de imágenes            |
+| **Expo DocumentPicker** | Selección de documentos                            |
 
 ---
 
@@ -148,6 +150,15 @@ cd Altokke_movil
 npm install
 ```
 
+## 4. Configurar variables de entorno (Supabase)
+
+Debes poner las credenciales de la base de datos y crea un archivo llamado `.env` en la raíz del proyecto (junto a `package.json`) con el siguiente formato:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=aqui_va_la_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=aqui_va_la_key
+```
+
 ## 4. Iniciar Expo
 
 ```bash
@@ -170,12 +181,12 @@ npx expo start -c
 
 # 👥 Equipo
 
-| Integrante | GitHub | Participación principal |
-|---|---|---|
-| **Jhunior Aldahir Cercado Acuña** | `@jhunior-cercado` | Cuenta del pasajero y funcionalidades del conductor |
-| **Elvita Donina Garro Gómez** | `@doninaa` | Flujo principal de solicitud y viaje del pasajero |
-| **Hellen Shanela Mas Tuesta** | `@hellen-mas` | Registro y cuenta del conductor |
-| **Juan Carlos Sandoval Núñez** | `@Juan-Sandoval-Dev` | Autenticación, recuperación de cuenta y registro del pasajero |
+| Integrante                        | GitHub               | Participación principal                                       |
+| --------------------------------- | -------------------- | ------------------------------------------------------------- |
+| **Jhunior Aldahir Cercado Acuña** | `@jhunior-cercado`   | Cuenta del pasajero y funcionalidades del conductor           |
+| **Elvita Donina Garro Gómez**     | `@doninaa`           | Flujo principal de solicitud y viaje del pasajero             |
+| **Hellen Shanela Mas Tuesta**     | `@hellen-mas`        | Registro y cuenta del conductor                               |
+| **Juan Carlos Sandoval Núñez**    | `@Juan-Sandoval-Dev` | Autenticación, recuperación de cuenta y registro del pasajero |
 
 > La participación individual también puede identificarse mediante el historial de **commits y contribuciones del repositorio**.
 
