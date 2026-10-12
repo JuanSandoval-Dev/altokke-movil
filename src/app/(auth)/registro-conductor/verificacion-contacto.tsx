@@ -1,4 +1,4 @@
-import CampoTexto from "@/components/ui/CampoTexto";
+import { CampoTexto } from "@/components/ui/CampoTexto";
 import { EncabezadoLogo } from "@/components/ui/EncabezadoLogo";
 import { EncabezadoPagina } from "@/components/ui/EncabezadoPagina";
 import BotonPrincipal from "@/components/ui/BotonPrincipal";
@@ -161,29 +161,29 @@ export default function VerificacionContactoConductor() {
           </View>
 
           <CampoTexto
-            textoReferencia="Código de verificación"
+            placeholder="Código de verificación"
             nombreIcono="shield-checkmark-outline"
-            valor={codigo}
-            alCambiarTexto={setCodigo}
+            value={codigo}
+            onChangeText={setCodigo}
             keyboardType="numeric"
             maxLength={6}
             variante="claro"
           />
           <CampoTexto
-            textoReferencia="Correo de respaldo (opcional)"
+            placeholder="Correo de respaldo (opcional)"
             nombreIcono="mail-outline"
-            valor={correoRespaldo}
-            alCambiarTexto={setCorreoRespaldo}
+            value={correoRespaldo}
+            onChangeText={setCorreoRespaldo}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
             variante="claro"
           />
           <CampoTexto
-            textoReferencia="Dirección actual"
+            placeholder="Dirección actual"
             nombreIcono="location-outline"
-            valor={direccion}
-            alCambiarTexto={setDireccion}
+            value={direccion}
+            onChangeText={setDireccion}
             variante="claro"
           />
         </View>
@@ -226,7 +226,7 @@ export default function VerificacionContactoConductor() {
           texto="Usaremos esta información para comunicarnos contigo y verificar tu cuenta."
         />
 
-        <BotonPrincipal titulo="Continuar" alPresionar={continuar} />
+        <BotonPrincipal titulo="Continuar" onPress={continuar} />
         <Pressable
           style={styles.atras}
           onPress={() => router.back()}

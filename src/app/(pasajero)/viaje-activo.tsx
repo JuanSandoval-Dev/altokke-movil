@@ -296,7 +296,7 @@ export default function PantallaViajeActivo() {
               { paddingBottom: Math.max(insets.bottom, 14) },
             ]}
           >
-            <BotonPrincipal titulo="Calificar viaje" alPresionar={calificarViaje} />
+            <BotonPrincipal titulo="Calificar viaje" onPress={calificarViaje} />
           </View>
         )}
       </View>

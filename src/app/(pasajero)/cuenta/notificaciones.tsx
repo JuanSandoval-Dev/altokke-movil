@@ -72,8 +72,8 @@ export default function Notificaciones() {
     sms: false,
   });
 
-  const cambiar = (clave: Clave, valor: boolean) => {
-    setActivas((anterior) => ({ ...anterior, [clave]: valor }));
+  const cambiar = (clave: Clave, value: boolean) => {
+    setActivas((anterior) => ({ ...anterior, [clave]: value }));
   };
 
   const renderItem = (opcion: Opcion) => (
@@ -86,7 +86,7 @@ export default function Notificaciones() {
       derecha={
         <Switch
           value={activas[opcion.clave]}
-          onValueChange={(valor) => cambiar(opcion.clave, valor)}
+          onValueChange={(value) => cambiar(opcion.clave, value)}
           trackColor={{
             false: paletaColores.bordeClaro,
             true: paletaColores.boton,

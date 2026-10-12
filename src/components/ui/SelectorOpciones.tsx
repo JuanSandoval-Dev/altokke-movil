@@ -4,17 +4,17 @@ import { Modal, Pressable, StyleSheet, Text, View, FlatList } from "react-native
 import { paletaColores } from "@/paletaColores";
 
 export interface PropsSelectorOpciones {
-  textoReferencia: string;
+  placeholder: string;
   nombreIcono: keyof typeof Ionicons.glyphMap;
-  valor: string;
+  value: string;
   opciones: string[];
-  alSeleccionar: (valor: string) => void;
+  alSeleccionar: (value: string) => void;
 }
 
 export function SelectorOpciones({
-  textoReferencia,
+  placeholder,
   nombreIcono,
-  valor,
+  value,
   opciones,
   alSeleccionar,
 }: PropsSelectorOpciones) {
@@ -24,8 +24,8 @@ export function SelectorOpciones({
     <>
       <Pressable style={estilos.contenedor} onPress={() => setModalVisible(true)}>
         <Ionicons name={nombreIcono} size={21} color={paletaColores.textoSecundario} />
-        <Text style={[estilos.texto, !valor && estilos.textoReferencia]}>
-          {valor || textoReferencia}
+        <Text style={[estilos.texto, !value && estilos.placeholder]}>
+          {value || placeholder}
         </Text>
         <Ionicons name="chevron-down" size={21} color={paletaColores.textoSecundario} />
       </Pressable>
@@ -39,7 +39,7 @@ export function SelectorOpciones({
         <Pressable style={estilos.superposicionModal} onPress={() => setModalVisible(false)}>
           <View style={estilos.contenidoModal}>
             <View style={estilos.cabeceraModal}>
-              <Text style={estilos.tituloModal}>{textoReferencia}</Text>
+              <Text style={estilos.tituloModal}>{placeholder}</Text>
               <Pressable onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color={paletaColores.texto} />
               </Pressable>
@@ -55,10 +55,10 @@ export function SelectorOpciones({
                     setModalVisible(false);
                   }}
                 >
-                  <Text style={[estilos.textoOpcion, valor === item && estilos.textoOpcionSeleccionada]}>
+                  <Text style={[estilos.textoOpcion, value === item && estilos.textoOpcionSeleccionada]}>
                     {item}
                   </Text>
-                  {valor === item && (
+                  {value === item && (
                     <Ionicons name="checkmark" size={20} color={paletaColores.boton} />
                   )}
                 </Pressable>
@@ -89,7 +89,7 @@ const estilos = StyleSheet.create({
     fontSize: 16,
     color: paletaColores.texto,
   },
-  textoReferencia: {
+  placeholder: {
     color: paletaColores.textoSecundario,
   },
   superposicionModal: {

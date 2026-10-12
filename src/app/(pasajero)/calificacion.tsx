@@ -70,7 +70,7 @@ function Estrellas({
           <Ionicons
             name={numero <= valor ? "star" : "star-outline"}
             size={tamano}
-            color={numero <= valor ? COLOR_ESTRELLA : paletaColores.deshabilitado}
+            color={numero <= valor ? COLOR_ESTRELLA : paletaColores.disabled}
           />
         </Pressable>
       ))}
@@ -286,7 +286,7 @@ export default function PantallaCalificacion() {
         style={[styles.pie, { paddingBottom: Math.max(insets.bottom, 14) }]}
       >
         {enviado ? (
-          <BotonPrincipal titulo="Volver al inicio" alPresionar={irAlInicio} />
+          <BotonPrincipal titulo="Volver al inicio" onPress={irAlInicio} />
         ) : (
           <>
             <Pressable

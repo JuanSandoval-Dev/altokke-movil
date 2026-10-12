@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { paletaColores } from "@/paletaColores";
 import { PiePaginaAutenticacion } from "@/components/ui/PiePaginaAutenticacion";
-import CampoTexto from "@/components/ui/CampoTexto";
+import { CampoTexto } from "@/components/ui/CampoTexto";
 import { EncabezadoLogo } from "@/components/ui/EncabezadoLogo";
 import { EncabezadoPagina } from "@/components/ui/EncabezadoPagina";
 import BotonPrincipal from "@/components/ui/BotonPrincipal";
@@ -123,26 +123,26 @@ export default function DatosPersonalesConductor() {
                 {/* Formulario */}
                 <View style={styles.formulario}>
                     <CampoTexto
-                        textoReferencia="Nombre completo"
+                        placeholder="Nombre completo"
                         nombreIcono="person-outline"
-                        valor={nombre}
-                        alCambiarTexto={setNombre}
+                        value={nombre}
+                        onChangeText={setNombre}
                         autoCapitalize="words"
                         variante="claro"
                     />
                     <CampoTexto
-                        textoReferencia="Apellidos"
+                        placeholder="Apellidos"
                         nombreIcono="person-outline"
-                        valor={apellidos}
-                        alCambiarTexto={setApellidos}
+                        value={apellidos}
+                        onChangeText={setApellidos}
                         autoCapitalize="words"
                         variante="claro"
                     />
                     <CampoTexto
-                        textoReferencia="DNI"
+                        placeholder="DNI"
                         nombreIcono="card-outline"
-                        valor={dni}
-                        alCambiarTexto={setDni}
+                        value={dni}
+                        onChangeText={setDni}
                         keyboardType="numeric"
                         maxLength={8}
                         variante="claro"
@@ -198,28 +198,28 @@ export default function DatosPersonalesConductor() {
                         />
                     )}
                     <CampoTexto
-                        textoReferencia="Correo electrónico"
+                        placeholder="Correo electrónico"
                         nombreIcono="mail-outline"
-                        valor={correo}
-                        alCambiarTexto={setCorreo}
+                        value={correo}
+                        onChangeText={setCorreo}
                         keyboardType="email-address"
                         autoCapitalize="none"
                         autoCorrect={false}
                         variante="claro"
                     />
                     <CampoTexto
-                        textoReferencia="Contraseña"
+                        placeholder="Contraseña"
                         nombreIcono="lock-closed-outline"
-                        valor={contrasena}
-                        alCambiarTexto={setContrasena}
+                        value={contrasena}
+                        onChangeText={setContrasena}
                         esPassword
                         variante="claro"
                     />
                     <CampoTexto
-                        textoReferencia="Confirmar contraseña"
+                        placeholder="Confirmar contraseña"
                         nombreIcono="lock-closed-outline"
-                        valor={confirmarContrasena}
-                        alCambiarTexto={setConfirmarContrasena}
+                        value={confirmarContrasena}
+                        onChangeText={setConfirmarContrasena}
                         esPassword
                         variante="claro"
                     />
@@ -233,7 +233,7 @@ export default function DatosPersonalesConductor() {
 
                 <BotonPrincipal
                     titulo="Continuar"
-                    alPresionar={continuar}
+                    onPress={continuar}
                 />
 
                 <PiePaginaAutenticacion

@@ -27,11 +27,10 @@ export const PiePaginaAutenticacion = ({
         estilos.accesoCuenta,
         { textAlign: alineacion },
         esClaro && estilos.accesoCuentaClaro,
-        !mostrarBorde && { borderWidth: 0 },
+        !mostrarBorde && { borderWidth: 0, height: "auto", paddingTop: 0 },
       ]}
     >
       {textoPregunta}{" "}
-
       <Link href={ruta} style={estilos.enlaceAcceso}>
         {textoEnlace}
       </Link>
@@ -42,24 +41,22 @@ export const PiePaginaAutenticacion = ({
 const estilos = StyleSheet.create({
   accesoCuenta: {
     width: "100%",
-    height: 50,
+    height: 56,
     borderWidth: 1,
     borderColor: paletaColores.borde,
-    borderRadius: 10,
+    borderRadius: 12,
     marginTop: 10,
     marginBottom: 10,
-    paddingTop: 13,
+    paddingTop: 16,
     paddingHorizontal: 20,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16, // Increased for accessibility
+    lineHeight: 24,
     color: paletaColores.texto,
   },
-
   enlaceAcceso: {
     color: paletaColores.verde,
-    fontWeight: "600",
+    fontWeight: "700",
   },
-
   accesoCuentaClaro: {
     color: paletaColores.textoSecundarioClaro,
     borderColor: paletaColores.bordeClaro,

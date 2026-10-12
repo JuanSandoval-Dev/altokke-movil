@@ -93,7 +93,7 @@ export default function PantallaActividad() {
               <Ionicons
                 name="time-outline"
                 size={40}
-                color={paletaColores.deshabilitado}
+                color={paletaColores.disabled}
               />
               <Text style={styles.vacioTexto}>{MENSAJE_VACIO[filtro]}</Text>
             </View>

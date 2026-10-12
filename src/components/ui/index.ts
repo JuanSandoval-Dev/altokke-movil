@@ -11,3 +11,5 @@ export * from './SelectorFecha';
 export * from './BotonRedesSociales';
 export * from './BarraNavegacionSuperior';
 export * from './ContenedorPantalla';
+export * from './CampoTextoHookForm';
+export * from './MedidorPasswordSeguro';

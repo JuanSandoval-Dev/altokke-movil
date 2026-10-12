@@ -21,10 +21,9 @@ export default function RecuperarPasswordScreen() {
       );
       return;
     }
-    // Enviamos el correo como parámetro
-    // Asegurando que caracteres especiales (como el @) puedan enviarse sin errores en la URL
+    // Envie el correo como parametro para que el @ pase sin errores en la URL
     router.push(
-      `/recuperar-cuenta/verificar?email=${encodeURIComponent(correo)}`,
+      `/recuperar-cuenta/verificar-codigo?email=${encodeURIComponent(correo)}`,
     );
   };
 
@@ -42,17 +41,17 @@ export default function RecuperarPasswordScreen() {
         <View style={styles.inputContainer}>
           <CampoTexto
             nombreIcono="mail-outline"
-            textoReferencia="Correo electrónico o teléfono"
+            placeholder="Correo electrónico o teléfono"
             keyboardType="email-address"
             autoCapitalize="none"
-            valor={correo}
-            alCambiarTexto={setCorreo}
+            value={correo}
+            onChangeText={setCorreo}
           />
         </View>
 
         <BotonPrincipal
           titulo="Continuar"
-          alPresionar={handleContinuar}
+          onPress={handleContinuar}
           estilo={styles.button}
         />
 
@@ -88,7 +87,7 @@ const styles = StyleSheet.create({
   },
   secondaryLink: {
     color: paletaColores.verde,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "500",
     textAlign: "center",
   },

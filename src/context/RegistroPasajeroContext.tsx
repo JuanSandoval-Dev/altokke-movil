@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useMemo, useCallback } from "react";
+import { TipoDatosPersonales } from "@/utils/validaciones";
 
 interface RegistroPasajeroContextType {
-  datosPersonales: any;
-  setDatosPersonales: (data: any) => void;
+  datosPersonales: Partial<TipoDatosPersonales>;
+  setDatosPersonales: (data: Partial<TipoDatosPersonales>) => void;
   preferencias: any;
   setPreferencias: (data: any) => void;
   clearRegistro: () => void;
@@ -21,21 +22,24 @@ export function RegistroPasajeroProvider({
   const [datosPersonales, setDatosPersonales] = useState({});
   const [preferencias, setPreferencias] = useState({});
 
-  const clearRegistro = () => {
+  const clearRegistro = useCallback(() => {
     setDatosPersonales({});
     setPreferencias({});
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      datosPersonales,
+      setDatosPersonales,
+      preferencias,
+      setPreferencias,
+      clearRegistro,
+    }),
+    [datosPersonales, preferencias, clearRegistro]
+  );
 
   return (
-    <RegistroPasajeroContext.Provider
-      value={{
-        datosPersonales,
-        setDatosPersonales,
-        preferencias,
-        setPreferencias,
-        clearRegistro,
-      }}
-    >
+    <RegistroPasajeroContext.Provider value={value}>
       {children}
     </RegistroPasajeroContext.Provider>
   );

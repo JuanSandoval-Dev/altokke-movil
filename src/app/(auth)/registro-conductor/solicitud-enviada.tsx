@@ -184,7 +184,7 @@ export default function SolicitudEnviada() {
             <View style={styles.acciones}>
                 <BotonPrincipal
                     titulo={contenido.textoBoton}
-                    alPresionar={manejarBoton}
+                    onPress={manejarBoton}
                 />
 
                 {estadoSolicitud === "PENDIENTE" && (

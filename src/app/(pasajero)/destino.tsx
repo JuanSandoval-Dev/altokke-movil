@@ -226,7 +226,7 @@ export default function PantallaDestino() {
 
         {destino && (
           <View style={styles.pie}>
-            <BotonPrincipal titulo="Confirmar destino" alPresionar={confirmarDestino} />
+            <BotonPrincipal titulo="Confirmar destino" onPress={confirmarDestino} />
           </View>
         )}
       </View>

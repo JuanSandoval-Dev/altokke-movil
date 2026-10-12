@@ -8,7 +8,12 @@
     "userInterfaceStyle": "automatic",
     "ios": {},
     "android": {
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDEX22QenhemDgCDRgFjQHQafhWNLNAiM8"
+        }
+      }
     },
     "web": {
       "output": "static"

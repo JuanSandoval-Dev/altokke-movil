@@ -182,7 +182,7 @@ export default function PantallaConfirmarViaje() {
                     color={
                       seleccionada
                         ? paletaColores.boton
-                        : paletaColores.deshabilitado
+                        : paletaColores.disabled
                     }
                   />
                 </Pressable>
@@ -218,7 +218,7 @@ export default function PantallaConfirmarViaje() {
                     color={
                       seleccionado
                         ? paletaColores.boton
-                        : paletaColores.deshabilitado
+                        : paletaColores.disabled
                     }
                     style={styles.metodoRadio}
                   />
@@ -253,7 +253,7 @@ export default function PantallaConfirmarViaje() {
         </ScrollView>
 
         <View style={styles.pie}>
-          <BotonPrincipal titulo="Confirmar viaje" alPresionar={confirmarViaje} />
+          <BotonPrincipal titulo="Confirmar viaje" onPress={confirmarViaje} />
         </View>
       </View>
 
