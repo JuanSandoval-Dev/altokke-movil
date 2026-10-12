@@ -71,7 +71,6 @@ export default function PasajeroIdentidadScreen() {
       setLoadingDni(false);
     }
   };
-
   const onSubmit = (data: any) => {
     setDatosPersonales({ ...datosPersonales, ...data });
     router.push("/registro-pasajero/preferencias");
