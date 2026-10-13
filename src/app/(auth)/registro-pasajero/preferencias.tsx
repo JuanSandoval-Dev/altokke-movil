@@ -171,41 +171,12 @@ export default function PasajeroPreferenciasScreen() {
 
             setLoading(true);
 
-            // Reviso si ya hay una sesion activa de Google para solo actualizar su metadata
-            const { data: sessionData } = await supabase.auth.getSession();
+            // Si el usuario ingreso correo y contrasena, ejecuto el registro con signUp
+            if (datosPersonales.correo && datosPersonales.contrasena) {
+              // Cierro cualquier sesion previa residual para que el registro sea limpio
+              await supabase.auth.signOut();
 
-            if (sessionData?.session) {
-              const { error } = await supabase.auth.updateUser({
-                data: {
-                  nombre: datosPersonales.nombres,
-                  apellidos: datosPersonales.apellidos,
-                  telefono: datosPersonales.telefono,
-                  dni: datosPersonales.dni,
-                  notificaciones,
-                  ubicacion,
-                  promociones,
-                  rol: "pasajero",
-                },
-              });
-
-              setLoading(false);
-
-              if (error) {
-                Alert.alert("Error de registro", "No se pudo actualizar la cuenta.");
-              } else {
-                login("pasajero");
-                clearRegistro();
-                router.replace("/mapa");
-              }
-            } else {
-              // Registro el nuevo pasajero en Supabase Auth
-              if (!datosPersonales.correo || !datosPersonales.contrasena) {
-                setLoading(false);
-                Alert.alert("Datos incompletos", "Falta correo o contraseña.");
-                return;
-              }
-
-              const { error } = await supabase.auth.signUp({
+              const { data: signUpData, error } = await supabase.auth.signUp({
                 email: datosPersonales.correo.trim(),
                 password: datosPersonales.contrasena,
                 options: {
@@ -225,17 +196,51 @@ export default function PasajeroPreferenciasScreen() {
               setLoading(false);
 
               if (error) {
+                console.log("Error en signUp de Supabase:", error.message);
                 Alert.alert(
                   "Error de registro",
                   error.message || "No se pudo crear la cuenta. Inténtalo nuevamente más tarde."
                 );
+                return;
+              }
+
+              console.log("Usuario registrado con éxito en Supabase:", signUpData.user?.email);
+
+              Alert.alert(
+                "¡Bienvenido a Altokke!",
+                "Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión."
+              );
+              clearRegistro();
+              router.replace("/login");
+            } else {
+              // Si no ingreso contrasena es porque inicio sesion con Google OAuth
+              const { data: sessionData } = await supabase.auth.getSession();
+              if (sessionData?.session) {
+                const { error } = await supabase.auth.updateUser({
+                  data: {
+                    nombre: datosPersonales.nombres,
+                    apellidos: datosPersonales.apellidos,
+                    telefono: datosPersonales.telefono,
+                    dni: datosPersonales.dni,
+                    notificaciones,
+                    ubicacion,
+                    promociones,
+                    rol: "pasajero",
+                  },
+                });
+
+                setLoading(false);
+
+                if (error) {
+                  Alert.alert("Error de registro", "No se pudo actualizar la cuenta.");
+                } else {
+                  login("pasajero");
+                  clearRegistro();
+                  router.replace("/mapa");
+                }
               } else {
-                Alert.alert(
-                  "¡Bienvenido a Altokke!",
-                  "Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión."
-                );
-                clearRegistro();
-                router.replace("/login");
+                setLoading(false);
+                Alert.alert("Datos incompletos", "Falta correo o contraseña.");
               }
             }
           }}

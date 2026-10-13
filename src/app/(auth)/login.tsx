@@ -74,10 +74,18 @@ export default function LoginScreen() {
     setLoading(false);
 
     if (error) {
-      Alert.alert(
-        "No se pudo iniciar sesión",
-        "Correo o contraseña incorrectos. Por favor, verifica tus datos.",
-      );
+      console.log("Error de login en Supabase:", error.message, error.status);
+      if (error.message?.toLowerCase().includes("email not confirmed")) {
+        Alert.alert(
+          "Correo pendiente de confirmación",
+          "Supabase requiere confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada o desmarca 'Confirm email' en tu panel de Supabase.",
+        );
+      } else {
+        Alert.alert(
+          "No se pudo iniciar sesión",
+          error.message || "Correo o contraseña incorrectos. Por favor, verifica tus datos.",
+        );
+      }
       return;
     }
 
