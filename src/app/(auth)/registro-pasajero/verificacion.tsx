@@ -8,6 +8,7 @@ import {
 } from "@/components/ui";
 import { useRegistroPasajero } from "@/context/RegistroPasajeroContext";
 import { paletaColores } from "@/paletaColores";
+import { buscarDNI } from "@/utils/apiDNI";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
@@ -43,22 +44,33 @@ export default function PasajeroIdentidadScreen() {
 
   const dniActual = useWatch({ control, name: "dni" });
 
-  // Simulo la respuesta de RENIEC en local para no consumir APIs
+  // Cuando el usuario escribe los 8 digitos del DNI consulto la API automaticamente
   useEffect(() => {
     if (dniActual && dniActual.length === 8) {
-      setLoadingDni(true);
-      const timer = setTimeout(() => {
-        setValue("nombres", "Juan Carlos");
-        setValue("apellidos", "Sandoval Nuñez");
-        setLoadingDni(false);
-      }, 350);
-      return () => clearTimeout(timer);
+      consultarAPI(dniActual);
     } else if (dniActual && dniActual.length < 8) {
+      // Limpio los nombres si borra digitos del DNI
       setValue("nombres", "");
       setValue("apellidos", "");
     }
   }, [dniActual]);
 
+  const consultarAPI = async (numeroDni: string) => {
+    setLoadingDni(true);
+    try {
+      const datos = await buscarDNI(numeroDni);
+      // Relleno nombres y apellidos con lo que devolvio la API
+      setValue("nombres", datos.nombres);
+      setValue("apellidos", datos.apellidos);
+    } catch (error: any) {
+      Alert.alert(
+        "Validación fallida",
+        error?.message || "No se pudo validar el DNI. Por favor, verifica el número e inténtalo nuevamente."
+      );
+    } finally {
+      setLoadingDni(false);
+    }
+  };
   const onSubmit = (data: any) => {
     setDatosPersonales({ ...datosPersonales, ...data });
     router.push("/registro-pasajero/preferencias");
