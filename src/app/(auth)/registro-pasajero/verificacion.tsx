@@ -1,97 +1,88 @@
 import {
   BarraNavegacionSuperior,
   BotonPrincipal,
-  CampoCodigoVerificacion,
+  CampoTextoHookForm,
   ContenedorPantalla,
   EncabezadoPagina,
   IndicadorPasos,
 } from "@/components/ui";
-import { supabase } from "@/lib/supabase";
+import { useRegistroPasajero } from "@/context/RegistroPasajeroContext";
 import { paletaColores } from "@/paletaColores";
+import { buscarDNI } from "@/utils/apiDNI";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { useForm, useWatch } from "react-hook-form";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import * as yup from "yup";
 
-export default function PasajeroVerificacionScreen() {
-  // Tomo el correo que vino como parametro en la URL
-  const { email } = useLocalSearchParams<{ email: string }>();
+const esquemaPaso2 = yup.object({
+  dni: yup.string().length(8, "El DNI debe tener 8 dígitos").required("Requerido"),
+  nombres: yup.string().required("Requerido"),
+  apellidos: yup.string().required("Requerido"),
+  telefono: yup.string().required("Requerido").min(9, "Debe tener 9 dígitos"),
+});
 
-  const [codigo, setCodigo] = useState("");
-  const [timer, setTimer] = useState(58);
-  const [loading, setLoading] = useState(false);
-  const [reenviando, setReenviando] = useState(false);
+export default function PasajeroIdentidadScreen() {
+  const { datosPersonales, setDatosPersonales } = useRegistroPasajero();
+  const [loadingDni, setLoadingDni] = useState(false);
 
-  // Contador de segundos para volver a pedir el codigo
+  const {
+    control,
+    handleSubmit,
+    setValue,
+  } = useForm({
+    resolver: yupResolver(esquemaPaso2),
+    defaultValues: {
+      dni: datosPersonales.dni || "",
+      nombres: datosPersonales.nombres || "",
+      apellidos: datosPersonales.apellidos || "",
+      telefono: datosPersonales.telefono || "",
+    },
+  });
+
+  const dniActual = useWatch({ control, name: "dni" });
+
+  // Cuando el usuario escribe los 8 digitos del DNI consulto la API automaticamente
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+    if (dniActual && dniActual.length === 8) {
+      consultarAPI(dniActual);
+    } else if (dniActual && dniActual.length < 8) {
+      // Limpio los nombres si borra digitos del DNI
+      setValue("nombres", "");
+      setValue("apellidos", "");
     }
-    return () => clearInterval(interval);
-  }, [timer]);
+  }, [dniActual]);
 
-  const handleVerificar = async () => {
-    if (codigo.length < 6) {
+  const consultarAPI = async (numeroDni: string) => {
+    setLoadingDni(true);
+    try {
+      const datos = await buscarDNI(numeroDni);
+      // Relleno nombres y apellidos con lo que devolvio la API
+      setValue("nombres", datos.nombres);
+      setValue("apellidos", datos.apellidos);
+    } catch (error: any) {
       Alert.alert(
-        "Código incompleto",
-        "Por favor, ingresa el código completo de 6 dígitos."
+        "Validación fallida",
+        error?.message || "No se pudo validar el DNI. Por favor, verifica el número e inténtalo nuevamente."
       );
-      return;
+    } finally {
+      setLoadingDni(false);
     }
+  };
 
-    setLoading(true);
-
-    // Valido el codigo OTP de 6 digitos del registro con Supabase
-    const { error } = await supabase.auth.verifyOtp({
-      email: email || "",
-      token: codigo.trim(),
-      type: "signup",
-    });
-
-    setLoading(false);
-
-    if (error) {
-      Alert.alert(
-        "Código incorrecto",
-        "El código es inválido o ha expirado. Por favor, solicita uno nuevo."
-      );
-      return;
-    }
-
-    // Paso a la pantalla de preferencias tras validar el codigo
+  const onSubmit = (data: any) => {
+    // Guardo los datos de identidad y avanzo al paso de preferencias
+    setDatosPersonales({ ...datosPersonales, ...data });
     router.push("/registro-pasajero/preferencias");
   };
 
-  const handleReenviar = async () => {
-    if (timer > 0 || reenviando) return;
-    if (!email) {
-      Alert.alert("Error", "No se encontró el correo electrónico para reenviar el código.");
-      return;
-    }
-
-    setReenviando(true);
-
-    // Vuelvo a pedir a Supabase el codigo OTP para este correo
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: email,
-    });
-
-    setReenviando(false);
-
-    if (error) {
-      Alert.alert(
-        "Error al reenviar",
-        error.message || "No se pudo reenviar el código. Inténtalo más tarde."
-      );
-      return;
-    }
-
-    Alert.alert("Código reenviado", "Se envió un nuevo código de verificación a tu correo.");
-    setTimer(58);
+  const onError = () => {
+    Alert.alert(
+      "Datos requeridos",
+      "Por favor ingresa un número de DNI válido y tu teléfono para continuar."
+    );
   };
 
   return (
@@ -99,108 +90,92 @@ export default function PasajeroVerificacionScreen() {
       <BarraNavegacionSuperior titulo="Altokke" />
 
       <EncabezadoPagina
-        titulo="Verifica tu "
-        tituloDestacado="correo"
-        descripcion={`Ingresa el código de 6 dígitos que envié a:\n${email || "tu correo electrónico"}`}
+        titulo="Validación de "
+        tituloDestacado="identidad"
+        descripcion="Para la seguridad de nuestra comunidad, requerimos tu documento de identidad."
       />
 
       <IndicadorPasos pasoActual={2} totalPasos={3} />
 
       <View style={styles.formContainer}>
-        <CampoCodigoVerificacion numeroDigitos={6} onChangeText={setCodigo} />
-
-        <View style={styles.timerContainer}>
-          <Ionicons
-            name="time-outline"
-            size={16}
-            color={paletaColores.textoSecundario}
-          />
-          <Text style={styles.timerText}>
-            {timer > 0
-              ? `Reenviar código en 00:${timer.toString().padStart(2, "0")}`
-              : "Puedes reenviar el código"}
+        <View style={styles.infoCard}>
+          <Ionicons name="shield-checkmark" size={28} color={paletaColores.boton} />
+          <Text style={styles.infoText}>
+            Tu identidad será validada mediante conexión cifrada con el Registro Nacional de Identificación y Estado Civil (RENIEC).
           </Text>
         </View>
 
-        <BotonPrincipal
-          titulo={loading ? "Verificando..." : "Confirmar código"}
-          onPress={handleVerificar}
-          disabled={loading}
-          estilo={styles.verifyButton}
+        <View style={styles.dniContainer}>
+          <View style={{ flex: 1 }}>
+            <CampoTextoHookForm
+              control={control}
+              name="dni"
+              nombreIcono="card-outline"
+              placeholder="Número de DNI"
+              keyboardType="numeric"
+              maxLength={8}
+            />
+          </View>
+          {loadingDni && (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator color={paletaColores.boton} />
+            </View>
+          )}
+        </View>
+
+        <CampoTextoHookForm
+          control={control}
+          name="nombres"
+          nombreIcono="person-outline"
+          placeholder="Nombres completos"
+          editable={false}
+          style={{ backgroundColor: "rgba(0,0,0,0.05)" }}
         />
 
-        <View style={styles.resendContainer}>
-          <Text style={styles.resendText}>¿No recibiste el código? </Text>
-          <Pressable onPress={handleReenviar} disabled={timer > 0 || reenviando}>
-            <Text
-              style={[
-                styles.resendLink,
-                (timer > 0 || reenviando) && { opacity: 0.5 },
-              ]}
-            >
-              {reenviando ? "Reenviando..." : "Reenviar"}
-            </Text>
-          </Pressable>
-        </View>
+        <CampoTextoHookForm
+          control={control}
+          name="apellidos"
+          nombreIcono="people-outline"
+          placeholder="Apellidos completos"
+          editable={false}
+          style={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+        />
+
+        <CampoTextoHookForm
+          control={control}
+          name="telefono"
+          nombreIcono="call-outline"
+          placeholder="Teléfono celular (ej. 987654321)"
+          keyboardType="phone-pad"
+        />
       </View>
 
-      <View style={styles.footerContainer}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={styles.footerText}>Atrás</Text>
-        </Pressable>
+      <View style={styles.buttonContainer}>
+        <BotonPrincipal
+          titulo="Siguiente"
+          onPress={handleSubmit(onSubmit, onError)}
+          disabled={loadingDni}
+        />
       </View>
     </ContenedorPantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 40,
-    flexGrow: 1,
-  },
-  formContainer: {
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  timerContainer: {
+  scrollContent: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, flexGrow: 1 },
+  formContainer: { gap: 16, marginBottom: 30, marginTop: 20 },
+  buttonContainer: { marginBottom: 20, marginTop: "auto" },
+  dniContainer: { flexDirection: "row", alignItems: "center" },
+  loaderContainer: { position: "absolute", right: 15, top: 15 },
+  infoCard: {
     flexDirection: "row",
+    backgroundColor: "rgba(53, 233, 130, 0.1)",
+    padding: 12,
+    borderRadius: 8,
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 12,
-    marginBottom: 30,
-    gap: 6,
+    gap: 12,
+    marginTop: -5,
+    marginBottom: 5,
   },
-  timerText: {
-    color: paletaColores.textoSecundario,
-    fontSize: 16,
-  },
-  verifyButton: {
-    marginTop: 10,
-  },
-  resendContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 24,
-  },
-  resendText: {
-    color: paletaColores.textoSecundario,
-    fontSize: 16,
-  },
-  resendLink: {
-    color: paletaColores.verde,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  footerContainer: {
-    marginTop: "auto",
-    alignItems: "center",
-    paddingVertical: 16,
-  },
-  footerText: {
-    color: paletaColores.textoSecundario,
-    fontSize: 16,
-    fontWeight: "500",
-  },
+  infoText: { color: paletaColores.texto, flex: 1, fontSize: 15, lineHeight: 22 },
 });

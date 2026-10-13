@@ -148,7 +148,7 @@ export default function PasajeroPreferenciasScreen() {
         </Pressable>
 
         <BotonPrincipal
-          titulo={loading ? "Guardando..." : "Finalizar"}
+          titulo={loading ? "Creando cuenta..." : "Crear cuenta"}
           disabled={!terminos || loading}
           onPress={async () => {
             if (!terminos) {
@@ -156,15 +156,31 @@ export default function PasajeroPreferenciasScreen() {
               return;
             }
 
+            if (
+              !datosPersonales.nombres ||
+              !datosPersonales.apellidos ||
+              !datosPersonales.telefono ||
+              !datosPersonales.dni
+            ) {
+              Alert.alert(
+                "Datos incompletos",
+                "Faltan datos obligatorios. Por favor regresa a los pasos anteriores y completa tu información."
+              );
+              return;
+            }
+
             setLoading(true);
 
-            // Reviso si la sesion ya esta activa tras verificar el codigo OTP
+            // Reviso si ya hay una sesion activa de Google para solo actualizar su metadata
             const { data: sessionData } = await supabase.auth.getSession();
 
-            if (sessionData.session) {
-              // Guardo las preferencias del pasajero en su metadata de Supabase
-              await supabase.auth.updateUser({
+            if (sessionData?.session) {
+              const { error } = await supabase.auth.updateUser({
                 data: {
+                  nombre: datosPersonales.nombres,
+                  apellidos: datosPersonales.apellidos,
+                  telefono: datosPersonales.telefono,
+                  dni: datosPersonales.dni,
                   notificaciones,
                   ubicacion,
                   promociones,
@@ -173,18 +189,54 @@ export default function PasajeroPreferenciasScreen() {
               });
 
               setLoading(false);
-              login("pasajero");
-              clearRegistro();
-              router.replace("/mapa");
+
+              if (error) {
+                Alert.alert("Error de registro", "No se pudo actualizar la cuenta.");
+              } else {
+                login("pasajero");
+                clearRegistro();
+                router.replace("/mapa");
+              }
             } else {
-              // Si no hay sesion activa envio al login para que ingrese con sus datos
+              // Registro el nuevo pasajero en Supabase Auth
+              if (!datosPersonales.correo || !datosPersonales.contrasena) {
+                setLoading(false);
+                Alert.alert("Datos incompletos", "Falta correo o contraseña.");
+                return;
+              }
+
+              const { error } = await supabase.auth.signUp({
+                email: datosPersonales.correo.trim(),
+                password: datosPersonales.contrasena,
+                options: {
+                  data: {
+                    nombre: datosPersonales.nombres,
+                    apellidos: datosPersonales.apellidos,
+                    telefono: datosPersonales.telefono,
+                    dni: datosPersonales.dni,
+                    notificaciones,
+                    ubicacion,
+                    promociones,
+                    rol: "pasajero",
+                  },
+                },
+              });
+
               setLoading(false);
-              clearRegistro();
-              Alert.alert(
-                "¡Bienvenido a Altokke!",
-                "Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión."
-              );
-              router.replace("/login");
+
+              if (error) {
+                Alert.alert(
+                  "Error de registro",
+                  error.message || "No se pudo crear la cuenta. Inténtalo nuevamente más tarde."
+                );
+              } else {
+                Alert.alert(
+                  "¡Bienvenido a Altokke!",
+                  "Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión."
+                );
+                clearRegistro();
+                router.replace("/login");
+              }
             }
           }}
           estilo={styles.botonCrear}
