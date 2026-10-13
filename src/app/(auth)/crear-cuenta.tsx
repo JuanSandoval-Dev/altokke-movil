@@ -9,6 +9,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "@/lib/supabase";
 
 type RolSeleccionado = "pasajero" | "conductor" | null;
 
@@ -16,7 +17,11 @@ export default function CrearCuentaScreen() {
   const [selectedRole, setSelectedRole] = useState<RolSeleccionado>("pasajero");
   const router = useRouter();
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    // Si ya inicio con Google salta correo y contraseña y va directo a verificar su identidad
+    const { data } = await supabase.auth.getSession();
+    const hasSession = !!data.session;
+
     if (selectedRole === "pasajero") {
       router.push("/registro-pasajero");
     } else if (selectedRole === "conductor") {

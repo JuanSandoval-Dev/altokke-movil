@@ -4,16 +4,19 @@ import {
   ContenedorPantalla,
   EncabezadoLogo,
 } from "@/components/ui";
+import { supabase } from "@/lib/supabase";
 import { paletaColores } from "@/paletaColores";
 import { esquemaNuevaContrasena } from "@/utils/validaciones";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, View } from "react-native";
 
 export default function NuevoPasswordScreen() {
+  const [loading, setLoading] = useState(false);
+
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(esquemaNuevaContrasena),
     defaultValues: {
@@ -22,9 +25,29 @@ export default function NuevoPasswordScreen() {
     },
   });
 
-  const onSubmit = () => {
-    Alert.alert("Éxito", "La contraseña se actualizó correctamente.");
-    router.push("/login");
+  const onSubmit = async (data: any) => {
+    setLoading(true);
+
+    // Actualizo la contraseña del usuario en Supabase
+    const { error } = await supabase.auth.updateUser({
+      password: data.password,
+    });
+
+    if (error) {
+      setLoading(false);
+      Alert.alert(
+        "Error al actualizar",
+        error.message || "No se pudo actualizar la contraseña. Es posible que el enlace haya expirado."
+      );
+      return;
+    }
+
+    // Cierro la sesion temporal para que el usuario inicie sesión con su nueva clave
+    await supabase.auth.signOut();
+    setLoading(false);
+
+    Alert.alert("Éxito", "La contraseña se actualizó correctamente. Por favor inicia sesión.");
+    router.replace("/login");
   };
 
   const onError = () => {
@@ -83,8 +106,9 @@ export default function NuevoPasswordScreen() {
         </View>
 
         <BotonPrincipal
-          titulo="Guardar contraseña"
+          titulo={loading ? "Guardando..." : "Guardar contraseña"}
           onPress={handleSubmit(onSubmit, onError)}
+          disabled={loading}
           estilo={styles.submitButton}
         />
       </View>
