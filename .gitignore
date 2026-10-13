@@ -43,5 +43,4 @@ example
 /android
 
 .env
-.supabase-backup.md
 database/

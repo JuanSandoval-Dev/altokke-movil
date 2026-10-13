@@ -4,13 +4,12 @@ import {
   ContenedorPantalla,
   EncabezadoLogo,
 } from "@/components/ui";
+import { supabase } from "@/lib/supabase";
 import { paletaColores } from "@/paletaColores";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, router } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
-
-import { useLocalSearchParams } from "expo-router";
 
 export default function VerificacionCodigoScreen() {
   // Saco el correo que llego como parametro en la URL
@@ -18,6 +17,8 @@ export default function VerificacionCodigoScreen() {
 
   const [codigo, setCodigo] = useState("");
   const [timer, setTimer] = useState(58);
+  const [loading, setLoading] = useState(false);
+  const [reenviando, setReenviando] = useState(false);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -30,7 +31,7 @@ export default function VerificacionCodigoScreen() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  const handleVerificar = () => {
+  const handleVerificar = async () => {
     if (codigo.length < 6) {
       Alert.alert(
         "Código incompleto",
@@ -38,17 +39,54 @@ export default function VerificacionCodigoScreen() {
       );
       return;
     }
-    if (codigo !== "123456") {
-      Alert.alert("Código incorrecto", "El código OTP ingresado no es válido.");
+
+    setLoading(true);
+
+    // Valido el codigo OTP de recuperacion en Supabase
+    const { error } = await supabase.auth.verifyOtp({
+      email: email || "",
+      token: codigo.trim(),
+      type: "recovery",
+    });
+
+    setLoading(false);
+
+    if (error) {
+      Alert.alert(
+        "Código incorrecto",
+        "El código OTP es inválido o ha expirado. Por favor, solicita uno nuevo."
+      );
       return;
     }
+
+    // Paso a la pantalla donde se define la nueva contraseña
     router.push("/recuperar-cuenta/nueva-contrasena");
   };
 
-  const handleReenviar = () => {
-    if (timer === 0) {
-      setTimer(58);
+  const handleReenviar = async () => {
+    if (timer > 0 || reenviando) return;
+    if (!email) {
+      Alert.alert("Error", "No se encontró el correo electrónico para reenviar el código.");
+      return;
     }
+
+    setReenviando(true);
+
+    // Vuelvo a pedir el envio del codigo de recuperacion a Supabase
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    setReenviando(false);
+
+    if (error) {
+      Alert.alert(
+        "Error al reenviar",
+        error.message || "No se pudo reenviar el código. Inténtalo más tarde."
+      );
+      return;
+    }
+
+    Alert.alert("Código reenviado", "Se envió un nuevo código de verificación a tu correo.");
+    setTimer(58);
   };
 
   return (
@@ -74,15 +112,21 @@ export default function VerificacionCodigoScreen() {
           </Text>
         </View>
         <BotonPrincipal
-          titulo="Verificar"
+          titulo={loading ? "Verificando..." : "Verificar"}
           onPress={handleVerificar}
+          disabled={loading}
           estilo={styles.verifyButton}
         />
         <View style={styles.resendContainer}>
           <Text style={styles.resendText}>¿No recibiste el código? </Text>
-          <Pressable onPress={handleReenviar} disabled={timer > 0}>
-            <Text style={[styles.resendLink, timer > 0 && { opacity: 0.5 }]}>
-              Reenviar
+          <Pressable onPress={handleReenviar} disabled={timer > 0 || reenviando}>
+            <Text
+              style={[
+                styles.resendLink,
+                (timer > 0 || reenviando) && { opacity: 0.5 },
+              ]}
+            >
+              {reenviando ? "Reenviando..." : "Reenviar"}
             </Text>
           </Pressable>
         </View>

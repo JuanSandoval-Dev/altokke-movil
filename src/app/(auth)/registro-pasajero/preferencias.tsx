@@ -10,6 +10,8 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 
 interface OpcionPreferenciaProps {
   icono: keyof typeof Ionicons.glyphMap;
@@ -59,6 +61,7 @@ export default function PasajeroPreferenciasScreen() {
   
   const { datosPersonales, clearRegistro } = useRegistroPasajero();
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const opciones: OpcionPreferenciaProps[] = [
     {
@@ -145,35 +148,44 @@ export default function PasajeroPreferenciasScreen() {
         </Pressable>
 
         <BotonPrincipal
-          titulo={loading ? "Creando cuenta..." : "Crear cuenta"}
+          titulo={loading ? "Guardando..." : "Finalizar"}
           disabled={!terminos || loading}
-          onPress={() => {
+          onPress={async () => {
             if (!terminos) {
               Alert.alert("Acción requerida", "Debes aceptar los términos y condiciones para continuar.");
               return;
             }
 
-            if (
-              !datosPersonales.nombres ||
-              !datosPersonales.apellidos ||
-              !datosPersonales.telefono ||
-              !datosPersonales.dni
-            ) {
-              Alert.alert(
-                "Datos incompletos", 
-                "Faltan datos obligatorios. Por favor, regresa a los pasos anteriores y asegúrate de completar tu DNI, teléfono y demás información."
-              );
-              return;
-            }
-
             setLoading(true);
-            // Simulo la creacion de la cuenta en local
-            setTimeout(() => {
+
+            // Reviso si la sesion ya esta activa tras verificar el codigo OTP
+            const { data: sessionData } = await supabase.auth.getSession();
+
+            if (sessionData.session) {
+              // Guardo las preferencias del pasajero en su metadata de Supabase
+              await supabase.auth.updateUser({
+                data: {
+                  notificaciones,
+                  ubicacion,
+                  promociones,
+                  rol: "pasajero",
+                },
+              });
+
               setLoading(false);
-              Alert.alert("¡Bienvenido a Altokke!", "Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión.");
+              login("pasajero");
               clearRegistro();
-              router.push("/login");
-            }, 500);
+              router.replace("/mapa");
+            } else {
+              // Si no hay sesion activa envio al login para que ingrese con sus datos
+              setLoading(false);
+              clearRegistro();
+              Alert.alert(
+                "¡Bienvenido a Altokke!",
+                "Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión."
+              );
+              router.replace("/login");
+            }
           }}
           estilo={styles.botonCrear}
         />
