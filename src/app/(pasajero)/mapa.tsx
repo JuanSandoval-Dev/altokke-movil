@@ -1,7 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { ReactNode } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BarraInferior } from "@/components/pasajero/BarraInferior";
 import { CabeceraPasajero } from "@/components/pasajero/CabeceraPasajero";
 import { IconoMototaxi } from "@/components/pasajero/IconoMototaxi";
@@ -11,14 +7,16 @@ import {
   CENTRO_BAGUA,
   COLOR_CABECERA,
   CONDUCTORES_CERCANOS,
+  NOTIFICACIONES_EJEMPLO,
   ORIGEN_EJEMPLO,
 } from "@/constants/pasajero";
-import { PASAJERO_DEMO } from "@/constants/cuenta";
 import { TipoServicio, useViaje } from "@/context/ViajeContext";
+import { useNombrePasajero } from "@/hooks/use-nombre-pasajero";
 import { paletaColores } from "@/paletaColores";
-
-// Solo el primer nombre para el saludo ("Jhunior Cercado" -> "Jhunior")
-const PRIMER_NOMBRE = PASAJERO_DEMO.nombre.split(" ")[0];
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { ReactNode } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const SERVICIOS: {
   id: TipoServicio;
@@ -42,7 +40,9 @@ const SERVICIOS: {
     id: "reserva",
     titulo: "Reserva",
     descripcion: "Programa tu viaje",
-    icono: (color) => <Ionicons name="calendar-outline" size={26} color={color} />,
+    icono: (color) => (
+      <Ionicons name="calendar-outline" size={26} color={color} />
+    ),
   },
 ];
 
@@ -57,6 +57,7 @@ const DESTINOS_FRECUENTES: {
 
 export default function PantallaMapa() {
   const { tipoServicio, setTipoServicio, destino, setDestino } = useViaje();
+  const nombre = useNombrePasajero();
 
   const irADestino = () => {
     router.push("/destino");
@@ -75,16 +76,23 @@ export default function PantallaMapa() {
       >
         {/* Cabecera */}
         <CabeceraPasajero
-          titulo={`Hola, ${PRIMER_NOMBRE} 👋`}
+          titulo={nombre ? `Hola, ${nombre} 👋` : "Hola 👋"}
           subtitulo="¿A dónde te llevamos hoy?"
           paddingInferior={72}
+          hayNotificaciones={NOTIFICACIONES_EJEMPLO.some(
+            (notificacion) => !notificacion.leida,
+          )}
         />
 
         {/* Origen y destino */}
         <View style={styles.tarjetaRuta}>
           <View style={styles.filaOrigen}>
             <View style={styles.iconoOrigen}>
-              <Ionicons name="radio-button-on" size={20} color={paletaColores.boton} />
+              <Ionicons
+                name="radio-button-on"
+                size={20}
+                color={paletaColores.boton}
+              />
             </View>
 
             <View style={styles.textoOrigen}>
@@ -188,7 +196,11 @@ export default function PantallaMapa() {
               onPress={irADestino}
               style={styles.frecuente}
             >
-              <Ionicons name={destino.icono} size={22} color={paletaColores.boton} />
+              <Ionicons
+                name={destino.icono}
+                size={22}
+                color={paletaColores.boton}
+              />
               <View style={styles.frecuenteTextos}>
                 <Text
                   style={styles.frecuenteNombre}
@@ -207,9 +219,15 @@ export default function PantallaMapa() {
 
         {/* Mensaje de seguridad */}
         <View style={styles.seguridad}>
-          <Ionicons name="shield-checkmark" size={38} color={paletaColores.verde} />
+          <Ionicons
+            name="shield-checkmark"
+            size={38}
+            color={paletaColores.verde}
+          />
           <View style={styles.seguridadTextos}>
-            <Text style={styles.seguridadTitulo}>Viaja más seguro en Bagua</Text>
+            <Text style={styles.seguridadTitulo}>
+              Viaja más seguro en Bagua
+            </Text>
             <Text style={styles.seguridadDetalle}>
               Conductores verificados y de confianza
             </Text>
