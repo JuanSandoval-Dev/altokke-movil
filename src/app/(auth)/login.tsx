@@ -171,7 +171,7 @@ export default function LoginScreen() {
           <EncabezadoPagina
             titulo={"Iniciar "}
             tituloDestacado="sesión"
-            descripcion="Ingresa a tu cuenta para pedir tu mototaxi."
+            descripcion="Ingresa a tu cuenta para viajar por tu ciudad o generar ingresos."
           />
         </View>
 
