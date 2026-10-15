@@ -22,7 +22,14 @@ export async function buscarDNI(dni: string) {
     const data = await response.json();
 
     if (!response.ok || !data.success || !data.data) {
-      throw new Error(data.message || "No se encontraron datos para este DNI.");
+      const msg = (data?.message || "").toLowerCase();
+      if (msg.includes("not found") || msg.includes("no encontrado")) {
+        throw new Error("No se encontraron datos registrados para este número de DNI.");
+      }
+      if (msg.includes("unauthorized") || msg.includes("token") || msg.includes("forbidden")) {
+        throw new Error("El servicio de validación RENIEC está temporalmente no disponible.");
+      }
+      throw new Error("No se pudo validar el DNI. Por favor verifica el número e inténtalo nuevamente.");
     }
 
     const { nombres, apellido_paterno, apellido_materno } = data.data;
@@ -36,6 +43,10 @@ export async function buscarDNI(dni: string) {
       apellidos: apellidos?.trim() || "",
     };
   } catch (error: any) {
+    const errorMsg = (error?.message || "").toLowerCase();
+    if (errorMsg.includes("network request failed") || errorMsg.includes("fetch")) {
+      throw new Error("Error de conexión. Verifica tu acceso a internet e inténtalo de nuevo.");
+    }
     throw error;
   }
 }
