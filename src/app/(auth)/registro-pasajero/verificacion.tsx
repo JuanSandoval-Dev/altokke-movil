@@ -7,6 +7,7 @@ import {
   IndicadorPasos,
 } from "@/components/ui";
 import { useRegistroPasajero } from "@/context/RegistroPasajeroContext";
+import { supabase } from "@/lib/supabase";
 import { paletaColores } from "@/paletaColores";
 import { buscarDNI } from "@/utils/apiDNI";
 import { seleccionarFotoGaleria } from "@/utils/avatar";
@@ -70,6 +71,35 @@ export default function PasajeroIdentidadScreen() {
     Keyboard.dismiss();
     setLoadingDni(true);
     try {
+      // 1. Verificamos primero en nuestra base de datos para no malgastar consultas de la API de pago
+      const { data: usuarioExistente, error: dbError } = await supabase
+        .from("usuarios")
+        .select("id, rol")
+        .eq("dni", numeroDni.trim())
+        .maybeSingle();
+
+      if (!dbError && usuarioExistente) {
+        setDniValidado(false);
+        setValue("nombres", "");
+        setValue("apellidos", "");
+        Alert.alert(
+          "DNI ya registrado",
+          `Este número de DNI ya pertenece a una cuenta registrada. Si es tu cuenta, por favor inicia sesión con tus credenciales.`,
+          [
+            {
+              text: "Iniciar sesión",
+              onPress: () => router.replace("/login"),
+            },
+            {
+              text: "Entendido",
+              style: "cancel",
+            },
+          ]
+        );
+        return;
+      }
+
+      // 2. Solo si no está registrado en la base de datos, consultamos a la API de RENIEC
       const datos = await buscarDNI(numeroDni);
       setValue("nombres", datos.nombres);
       setValue("apellidos", datos.apellidos);
@@ -88,16 +118,26 @@ export default function PasajeroIdentidadScreen() {
     }
   }, [setValue]);
 
-  // Cuando el usuario escribe los 8 dígitos del DNI consulto la API automáticamente
+  // Cuando el usuario escribe los 8 dígitos del DNI, aplicamos debounce de 400ms para evitar saturación de peticiones
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
     if (dniActual && dniActual.length === 8) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      consultarAPI(dniActual);
+      timeoutId = setTimeout(() => {
+        consultarAPI(dniActual);
+      }, 400);
     } else if (dniActual && dniActual.length < 8) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDniValidado(false);
       setValue("nombres", "");
       setValue("apellidos", "");
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [dniActual, consultarAPI, setValue]);
 
   const onSubmit = (data: any) => {

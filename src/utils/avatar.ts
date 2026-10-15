@@ -1,4 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { supabase } from "@/lib/supabase";
 
 export interface ResultadoAvatar {
@@ -14,7 +15,7 @@ export interface InfoFotoSeleccionada {
 
 /**
  * Abre el selector de imágenes de Expo para elegir y recortar una foto de perfil en formato cuadrado (1:1).
- * Retorna la URI local y la representación base64 para envío rápido y confiable.
+ * Comprime y redimensiona localmente a 400x400 JPEG para optimizar la velocidad en conexiones 3G/lentas.
  */
 export async function seleccionarFotoGaleria(): Promise<InfoFotoSeleccionada | null> {
   const permiso = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -26,17 +27,24 @@ export async function seleccionarFotoGaleria(): Promise<InfoFotoSeleccionada | n
     mediaTypes: ["images"],
     allowsEditing: true,
     aspect: [1, 1],
-    quality: 0.7,
-    base64: true,
+    quality: 0.8,
   });
 
   if (resultado.canceled || !resultado.assets?.[0]?.uri) {
     return null;
   }
 
+  // Redimensionamos a 400x400 y comprimimos al 70% en el celular.
+  // Esto reduce fotos de 10 MB a ~50 KB, permitiendo subidas instantáneas incluso en 3G.
+  const optimizada = await manipulateAsync(
+    resultado.assets[0].uri,
+    [{ resize: { width: 400, height: 400 } }],
+    { compress: 0.7, format: SaveFormat.JPEG, base64: true }
+  );
+
   return {
-    uri: resultado.assets[0].uri,
-    base64: resultado.assets[0].base64 || undefined,
+    uri: optimizada.uri,
+    base64: optimizada.base64 || undefined,
   };
 }
 
@@ -77,9 +85,19 @@ export async function subirFotoAvatar(
       bodyPayload = formData;
     }
 
-    const { data, error } = await supabase.functions.invoke("upload-avatar", {
-      body: bodyPayload,
-    });
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(
+        () => reject(new Error("La subida tardó más de lo esperado. Por favor verifica tu conexión a internet.")),
+        15000
+      )
+    );
+
+    const { data, error } = await Promise.race([
+      supabase.functions.invoke("upload-avatar", {
+        body: bodyPayload,
+      }),
+      timeoutPromise,
+    ]);
 
     if (error) {
       let mensajeError = error.message || "Fallo en la subida o imagen rechazada.";

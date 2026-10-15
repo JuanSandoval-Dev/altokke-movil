@@ -285,6 +285,7 @@ export type Database = {
           apellidos: string
           avatar_url: string | null
           creado_en: string
+          dni?: string | null
           expo_push_token: string | null
           foto_url: string | null
           id: string
@@ -296,6 +297,7 @@ export type Database = {
           apellidos: string
           avatar_url?: string | null
           creado_en?: string
+          dni?: string | null
           expo_push_token?: string | null
           foto_url?: string | null
           id: string
@@ -307,6 +309,7 @@ export type Database = {
           apellidos?: string
           avatar_url?: string | null
           creado_en?: string
+          dni?: string | null
           expo_push_token?: string | null
           foto_url?: string | null
           id?: string

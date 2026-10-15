@@ -9,15 +9,24 @@ export async function buscarDNI(dni: string) {
   try {
     const url = "https://api.apiperu.dev/dni";
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ dni: dni.trim() }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ dni: dni.trim() }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const data = await response.json();
 
@@ -43,6 +52,9 @@ export async function buscarDNI(dni: string) {
       apellidos: apellidos?.trim() || "",
     };
   } catch (error: any) {
+    if (error?.name === "AbortError") {
+      throw new Error("La consulta de DNI tardó más de lo esperado. Por favor verifica tu conexión a internet e inténtalo de nuevo.");
+    }
     const errorMsg = (error?.message || "").toLowerCase();
     if (errorMsg.includes("network request failed") || errorMsg.includes("fetch")) {
       throw new Error("Error de conexión. Verifica tu acceso a internet e inténtalo de nuevo.");

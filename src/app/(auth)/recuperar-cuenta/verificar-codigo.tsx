@@ -20,6 +20,8 @@ export default function VerificacionCodigoScreen() {
   const [timer, setTimer] = useState(58);
   const [loading, setLoading] = useState(false);
   const [reenviando, setReenviando] = useState(false);
+  const [intentosFallidos, setIntentosFallidos] = useState(0);
+  const [bloqueadoHasta, setBloqueadoHasta] = useState<number | null>(null);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -32,6 +34,15 @@ export default function VerificacionCodigoScreen() {
   }, [timer]);
 
   const handleVerificar = async () => {
+    if (bloqueadoHasta && Date.now() < bloqueadoHasta) {
+      const segundosRestantes = Math.ceil((bloqueadoHasta - Date.now()) / 1000);
+      Alert.alert(
+        "Demasiados intentos",
+        `Has superado el límite de intentos permitidos. Por seguridad, espera ${segundosRestantes} segundos antes de volver a intentar.`
+      );
+      return;
+    }
+
     if (codigo.length < 6) {
       Alert.alert(
         "Código incompleto",
@@ -42,26 +53,58 @@ export default function VerificacionCodigoScreen() {
 
     setLoading(true);
 
-    const { error } = await supabase.auth.verifyOtp({
-      email: email || "",
-      token: codigo.trim(),
-      type: "recovery",
-    });
-
-    setLoading(false);
-
-    if (error) {
-      Alert.alert(
-        "Código incorrecto",
-        traducirErrorAuth(
-          error,
-          "El código OTP es inválido o ha expirado. Por favor, solicita uno nuevo."
+    try {
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error("La verificación tardó demasiado. Por favor verifica tu conexión e inténtalo de nuevo.")),
+          10000
         )
       );
-      return;
-    }
 
-    router.push("/recuperar-cuenta/nueva-contrasena");
+      const { error } = await Promise.race([
+        supabase.auth.verifyOtp({
+          email: email || "",
+          token: codigo.trim(),
+          type: "recovery",
+        }),
+        timeoutPromise,
+      ]);
+
+      setLoading(false);
+
+      if (error) {
+        const nuevosIntentos = intentosFallidos + 1;
+        setIntentosFallidos(nuevosIntentos);
+
+        if (nuevosIntentos >= 5) {
+          setBloqueadoHasta(Date.now() + 5 * 60 * 1000); // 5 minutos de bloqueo
+          Alert.alert(
+            "Acceso temporalmente bloqueado",
+            "Has alcanzado el límite de 5 intentos fallidos. Por seguridad, la verificación se ha bloqueado durante 5 minutos."
+          );
+          return;
+        }
+
+        Alert.alert(
+          "Código incorrecto",
+          `${traducirErrorAuth(
+            error,
+            "El código OTP es inválido o ha expirado. Por favor solicita uno nuevo."
+          )} (Intentos restantes: ${5 - nuevosIntentos})`
+        );
+        return;
+      }
+
+      setIntentosFallidos(0);
+      setBloqueadoHasta(null);
+      router.push("/recuperar-cuenta/nueva-contrasena");
+    } catch (err: any) {
+      setLoading(false);
+      Alert.alert(
+        "Error de verificación",
+        err?.message || "No se pudo verificar el código. Verifica tu conexión a internet."
+      );
+    }
   };
 
   const handleReenviar = async () => {
