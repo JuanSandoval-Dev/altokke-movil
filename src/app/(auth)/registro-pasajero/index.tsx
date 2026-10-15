@@ -93,18 +93,19 @@ export default function PasajeroDatosPersonalesScreen() {
             autoCapitalize="none"
             textContentType="newPassword"
           />
+
+          <CampoTextoHookForm
+            control={control}
+            name="confirmarContrasena"
+            nombreIcono="shield-checkmark-outline"
+            placeholder="Confirmar contraseña"
+            esPassword
+            autoCapitalize="none"
+            textContentType="newPassword"
+          />
+
           <MedidorPasswordSeguro contrasena={contrasenaActual} />
         </View>
-
-        <CampoTextoHookForm
-          control={control}
-          name="confirmarContrasena"
-          nombreIcono="shield-checkmark-outline"
-          placeholder="Confirmar contraseña"
-          esPassword
-          autoCapitalize="none"
-          textContentType="newPassword"
-        />
       </View>
 
       <View style={styles.bottomContainer}>
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   passwordContainer: {
-    gap: 8,
+    gap: 14,
   },
   bottomContainer: {
     marginTop: 16,
