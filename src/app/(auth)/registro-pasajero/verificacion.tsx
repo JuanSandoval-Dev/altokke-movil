@@ -14,10 +14,11 @@ import { seleccionarFotoGaleria } from "@/utils/avatar";
 import { traducirErrorAuth } from "@/utils/erroresAuth";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { ActivityIndicator, Alert, Image, Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Keyboard, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import * as yup from "yup";
 
 const esquemaPaso2 = yup.object({
@@ -25,6 +26,23 @@ const esquemaPaso2 = yup.object({
   nombres: yup.string().required("Requerido"),
   apellidos: yup.string().required("Requerido"),
   telefono: yup.string().required("Requerido").min(9, "Debe tener 9 dígitos"),
+  fechaNacimiento: yup.string()
+    .required("Selecciona tu fecha de nacimiento")
+    .test("mayor-de-edad", "Debes tener al menos 18 años para registrarte", (val) => {
+      if (!val) return false;
+      const partes = val.split("-");
+      if (partes.length !== 3) return false;
+      const [anio, mes, dia] = partes.map(Number);
+      if (!anio || !mes || !dia) return false;
+      const nac = new Date(anio, mes - 1, dia);
+      const hoy = new Date();
+      let edad = hoy.getFullYear() - nac.getFullYear();
+      const m = hoy.getMonth() - nac.getMonth();
+      if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) {
+        edad--;
+      }
+      return edad >= 18;
+    }),
 });
 
 export default function PasajeroIdentidadScreen() {
@@ -33,11 +51,13 @@ export default function PasajeroIdentidadScreen() {
   const [dniValidado, setDniValidado] = useState(false);
   const [fotoLocal, setFotoLocal] = useState<string | null>(datosPersonales.fotoPerfil || null);
   const [fotoBase64, setFotoBase64] = useState<string | null>(datosPersonales.fotoBase64 || null);
+  const [mostrarSelectorFecha, setMostrarSelectorFecha] = useState(false);
 
   const {
     control,
     handleSubmit,
     setValue,
+    formState: { errors },
   } = useForm({
     resolver: yupResolver(esquemaPaso2),
     defaultValues: {
@@ -45,12 +65,70 @@ export default function PasajeroIdentidadScreen() {
       nombres: datosPersonales.nombres || "",
       apellidos: datosPersonales.apellidos || "",
       telefono: datosPersonales.telefono || "",
+      fechaNacimiento: datosPersonales.fechaNacimiento || "",
     },
   });
 
   const dniActual = useWatch({ control, name: "dni" });
   const nombresActual = useWatch({ control, name: "nombres" });
   const apellidosActual = useWatch({ control, name: "apellidos" });
+  const fechaNacimientoActual = useWatch({ control, name: "fechaNacimiento" });
+
+  const calcularEdad = (fecha: Date) => {
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fecha.getFullYear();
+    const m = hoy.getMonth() - fecha.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < fecha.getDate())) {
+      edad--;
+    }
+    return edad;
+  };
+
+  const formatearFechaVista = (fechaIso?: string) => {
+    if (!fechaIso) return null;
+    const partes = fechaIso.split("-");
+    if (partes.length !== 3) return null;
+    const [anio, mes, dia] = partes.map(Number);
+    const nacimiento = new Date(anio, mes - 1, dia);
+    const edad = calcularEdad(nacimiento);
+    return {
+      texto: `${dia < 10 ? "0" + dia : dia}/${mes < 10 ? "0" + mes : mes}/${anio}`,
+      edad,
+      esMayor: edad >= 18,
+    };
+  };
+
+  const datosFecha = formatearFechaVista(fechaNacimientoActual);
+
+  const fechaMaximaPermitida = new Date();
+  fechaMaximaPermitida.setFullYear(fechaMaximaPermitida.getFullYear() - 18);
+
+  const fechaInicialPicker = fechaNacimientoActual
+    ? new Date(fechaNacimientoActual + "T00:00:00")
+    : fechaMaximaPermitida;
+
+  const alCambiarFecha = (event: DateTimePickerEvent, fechaSeleccionada?: Date) => {
+    if (Platform.OS === "android") {
+      setMostrarSelectorFecha(false);
+    }
+    if (event.type === "dismissed") {
+      return;
+    }
+    if (fechaSeleccionada) {
+      const edad = calcularEdad(fechaSeleccionada);
+      if (edad < 18) {
+        Alert.alert(
+          "Restricción de edad (+18)",
+          "Debes tener al menos 18 años para poder registrarte y solicitar viajes en Altokke.",
+          [{ text: "Entendido", style: "default" }]
+        );
+      }
+      const anio = fechaSeleccionada.getFullYear();
+      const mes = String(fechaSeleccionada.getMonth() + 1).padStart(2, "0");
+      const dia = String(fechaSeleccionada.getDate()).padStart(2, "0");
+      setValue("fechaNacimiento", `${anio}-${mes}-${dia}`, { shouldValidate: true });
+    }
+  };
 
   const elegirFotoPerfil = async () => {
     try {
@@ -151,10 +229,18 @@ export default function PasajeroIdentidadScreen() {
     router.push("/registro-pasajero/preferencias");
   };
 
-  const onError = () => {
+  const onError = (formErrors: any) => {
+    if (formErrors?.fechaNacimiento) {
+      Alert.alert(
+        "Mayoría de edad requerida",
+        formErrors.fechaNacimiento.message ||
+        "Debes ser mayor de 18 años para registrarte en Altokke y solicitar viajes."
+      );
+      return;
+    }
     Alert.alert(
       "Datos requeridos",
-      "Por favor ingresa un número de DNI válido y tu número de celular para continuar."
+      "Por favor ingresa un número de DNI válido, tu celular y tu fecha de nacimiento (+18 años) para continuar."
     );
   };
 
@@ -230,6 +316,70 @@ export default function PasajeroIdentidadScreen() {
           keyboardType="phone-pad"
           maxLength={9}
         />
+
+        {/* Selector de Fecha de Nacimiento con control +18 */}
+        <View style={styles.fechaCardWrapper}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.fechaSelectorContainer,
+              pressed && { opacity: 0.8 },
+              errors?.fechaNacimiento && styles.fechaSelectorError,
+              datosFecha?.esMayor && styles.fechaSelectorValido,
+            ]}
+            onPress={() => setMostrarSelectorFecha(true)}
+          >
+            <View style={styles.fechaIconoFila}>
+              <Ionicons
+                name="calendar-outline"
+                size={22}
+                color={
+                  datosFecha?.esMayor
+                    ? paletaColores.boton
+                    : errors?.fechaNacimiento
+                      ? "#FF5E5E"
+                      : paletaColores.textoSecundario
+                }
+              />
+              <View style={styles.fechaTextos}>
+                <Text style={styles.fechaLabel}>Fecha de nacimiento (+18 años)</Text>
+                <Text
+                  style={[
+                    styles.fechaValor,
+                    !datosFecha && styles.fechaPlaceholder,
+                  ]}
+                >
+                  {datosFecha
+                    ? `${datosFecha.texto} (${datosFecha.edad} años)`
+                    : "Selecciona tu fecha de nacimiento"}
+                </Text>
+              </View>
+            </View>
+            <Ionicons
+              name={datosFecha?.esMayor ? "checkmark-circle" : "chevron-forward"}
+              size={20}
+              color={
+                datosFecha?.esMayor
+                  ? paletaColores.boton
+                  : paletaColores.textoSecundario
+              }
+            />
+          </Pressable>
+          {errors?.fechaNacimiento?.message && (
+            <Text style={styles.fechaErrorTexto}>
+              {errors.fechaNacimiento.message as string}
+            </Text>
+          )}
+        </View>
+
+        {mostrarSelectorFecha && (
+          <DateTimePicker
+            value={fechaInicialPicker}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            maximumDate={new Date()}
+            onChange={alCambiarFecha}
+          />
+        )}
 
         {/* Sección de Foto de Perfil */}
         <View style={styles.fotoSectionCard}>
@@ -477,5 +627,54 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 16,
     gap: 12,
+  },
+  fechaCardWrapper: {
+    gap: 6,
+  },
+  fechaSelectorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: paletaColores.input,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1.5,
+    borderColor: paletaColores.borde,
+  },
+  fechaSelectorValido: {
+    borderColor: paletaColores.boton,
+    backgroundColor: "rgba(46, 206, 121, 0.05)",
+  },
+  fechaSelectorError: {
+    borderColor: "#FF5E5E",
+  },
+  fechaIconoFila: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+  },
+  fechaTextos: {
+    flex: 1,
+  },
+  fechaLabel: {
+    fontSize: 12,
+    color: paletaColores.textoSecundario,
+    marginBottom: 2,
+  },
+  fechaValor: {
+    fontSize: 15,
+    color: "#FFFFFF",
+    fontWeight: "600",
+  },
+  fechaPlaceholder: {
+    color: paletaColores.textoSecundario,
+    fontWeight: "400",
+  },
+  fechaErrorTexto: {
+    color: "#FF5E5E",
+    fontSize: 12,
+    marginLeft: 8,
   },
 });
