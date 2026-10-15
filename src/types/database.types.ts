@@ -323,6 +323,7 @@ export type Database = {
         Row: {
           activo: boolean | null
           anio: number | null
+          capacidad: number | null
           color: string
           conductor_id: string
           creado_en: string
@@ -334,6 +335,7 @@ export type Database = {
         Insert: {
           activo?: boolean | null
           anio?: number | null
+          capacidad?: number | null
           color: string
           conductor_id: string
           creado_en?: string
@@ -345,6 +347,7 @@ export type Database = {
         Update: {
           activo?: boolean | null
           anio?: number | null
+          capacidad?: number | null
           color?: string
           conductor_id?: string
           creado_en?: string
@@ -489,6 +492,9 @@ export type Database = {
       rol_usuario: "pasajero" | "conductor" | "admin"
       tipo_documento:
         | "DNI"
+        | "DNI_FRONTAL"
+        | "DNI_POSTERIOR"
+        | "SELFIE"
         | "LICENCIA"
         | "SOAT"
         | "ANTECEDENTES"
@@ -642,6 +648,9 @@ export const Constants = {
       rol_usuario: ["pasajero", "conductor", "admin"],
       tipo_documento: [
         "DNI",
+        "DNI_FRONTAL",
+        "DNI_POSTERIOR",
+        "SELFIE",
         "LICENCIA",
         "SOAT",
         "ANTECEDENTES",
