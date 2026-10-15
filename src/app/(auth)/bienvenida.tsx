@@ -52,8 +52,8 @@ export default function PantallaBienvenida() {
                 ]}
                 hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                 accessibilityRole="button"
-                accessibilityLabel="Configuración e información de Altokke"
-                accessibilityHint="Muestra información del servicio y soporte en Bagua"
+                accessibilityLabel="Información del servicio"
+                accessibilityHint="Muestra información del servicio y soporte"
               >
                 <Ionicons name="settings-sharp" size={24} color="#E2ECE6" />
               </Pressable>
@@ -63,7 +63,7 @@ export default function PantallaBienvenida() {
               <EncabezadoPagina
                 titulo={"Tu mototaxi,\n"}
                 tituloDestacado="cuando lo necesites."
-                descripcion="Pide un viaje en Bagua de forma rápida, segura y sencilla."
+                descripcion="Pide tu viaje de forma rápida, segura y sencilla."
               />
             </View>
           </View>
@@ -76,7 +76,7 @@ export default function PantallaBienvenida() {
               contentFit="contain"
               transition={300}
               accessibilityRole="image"
-              accessibilityLabel="Ilustración 3D de mototaxi Altokke en Bagua"
+              accessibilityLabel="Ilustración de mototaxi"
             />
           </View>
 
@@ -117,7 +117,7 @@ export default function PantallaBienvenida() {
             <View style={styles.cabeceraModal}>
               <View style={styles.iconoTituloModal}>
                 <Ionicons name="information-circle-outline" size={26} color="#2ECE79" />
-                <Text style={styles.tituloModal}>Altokke Bagua</Text>
+                <Text style={styles.tituloModal}>Información</Text>
               </View>
 
               <Pressable
@@ -139,8 +139,7 @@ export default function PantallaBienvenida() {
               showsVerticalScrollIndicator={false}
             >
               <Text style={styles.textoModal}>
-                Altokke es la aplicación móvil creada para conectar pasajeros y
-                conductores de mototaxis en la ciudad de Bagua, Perú.
+                Nuestra plataforma conecta a pasajeros y conductores de mototaxis de manera rápida, confiable y segura.
               </Text>
 
               <View style={styles.cajaInformativaModal}>
@@ -156,7 +155,7 @@ export default function PantallaBienvenida() {
 
               <View style={styles.filaVersion}>
                 <Text style={styles.etiquetaVersion}>Versión</Text>
-                <Text style={styles.valorVersion}>1.0.0 (Bagua, Amazonas)</Text>
+                <Text style={styles.valorVersion}>1.0.0</Text>
               </View>
             </ScrollView>
 

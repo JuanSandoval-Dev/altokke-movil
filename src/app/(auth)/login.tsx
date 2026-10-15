@@ -30,7 +30,7 @@ export default function LoginScreen() {
     // Si entro con Google y todavia no tiene rol ni DNI le aviso antes de enviarlo a completar perfil
     if (!user.user_metadata?.rol || !user.user_metadata?.dni) {
       Alert.alert(
-        "¡Bienvenido a Altokke!",
+        "¡Bienvenido!",
         "Detecté que es tu primera vez iniciando sesión con Google. Por favor completa tu registro seleccionando tu rol.",
         [
           {
@@ -149,7 +149,7 @@ export default function LoginScreen() {
   const handleTerms = () => {
     Alert.alert(
       "Términos de Servicio",
-      "Bienvenido a Altokke.\n\n1. Uso del Servicio: Nuestra plataforma conecta a usuarios con opciones de transporte y movilidad de forma segura.\n2. Cuentas y Responsabilidad: Eres responsable de la veracidad de los datos registrados y del resguardo de tu cuenta.\n3. Seguridad y Convivencia: Nos reservamos el derecho de suspender cuentas que infrinjan las normas de seguridad de la comunidad.",
+      "1. Uso del Servicio: Nuestra plataforma conecta a usuarios con opciones de transporte y movilidad de forma segura.\n2. Cuentas y Responsabilidad: Eres responsable de la veracidad de los datos registrados y del resguardo de tu cuenta.\n3. Seguridad y Convivencia: Nos reservamos el derecho de suspender cuentas que infrinjan las normas de seguridad de la comunidad.",
       [{ text: "Entendido", style: "default" }]
     );
   };
@@ -157,7 +157,7 @@ export default function LoginScreen() {
   const handlePrivacy = () => {
     Alert.alert(
       "Política de Privacidad",
-      "En Altokke protegemos tu información:\n\n1. Recopilación: Solo recolectamos los datos necesarios (correo, nombre, viajes) para la prestación del servicio.\n2. Seguridad: Tus credenciales y datos viajan cifrados bajo estándares de alta seguridad.\n3. Derechos: Tienes control total sobre tu cuenta y puedes gestionar tus datos en cualquier momento.",
+      "Protegemos tu información:\n\n1. Recopilación: Solo recolectamos los datos necesarios (correo, nombre, viajes) para la prestación del servicio.\n2. Seguridad: Tus credenciales y datos viajan cifrados bajo estándares de alta seguridad.\n3. Derechos: Tienes control total sobre tu cuenta y puedes gestionar tus datos en cualquier momento.",
       [{ text: "Entendido", style: "default" }]
     );
   };

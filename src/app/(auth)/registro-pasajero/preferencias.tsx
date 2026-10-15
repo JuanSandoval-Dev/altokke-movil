@@ -74,7 +74,7 @@ export default function PasajeroPreferenciasScreen() {
   const handleTerms = () => {
     Alert.alert(
       "Términos y Condiciones",
-      "Bienvenido a Altokke.\n\n1. Uso del Servicio: Nuestra plataforma conecta a usuarios con opciones de transporte y movilidad de forma segura.\n2. Cuentas y Responsabilidad: Eres responsable de la veracidad de los datos registrados y del resguardo de tu cuenta.\n3. Seguridad y Convivencia: Nos reservamos el derecho de suspender cuentas que infrinjan las normas de seguridad de la comunidad.",
+      "1. Uso del Servicio: Nuestra plataforma conecta a usuarios con opciones de transporte y movilidad de forma segura.\n2. Cuentas y Responsabilidad: Eres responsable de la veracidad de los datos registrados y del resguardo de tu cuenta.\n3. Seguridad y Convivencia: Nos reservamos el derecho de suspender cuentas que infrinjan las normas de seguridad de la comunidad.",
       [{ text: "Entendido", style: "default" }]
     );
   };
@@ -82,7 +82,7 @@ export default function PasajeroPreferenciasScreen() {
   const handlePrivacy = () => {
     Alert.alert(
       "Política de Privacidad",
-      "En Altokke protegemos tu información:\n\n1. Recopilación: Solo recolectamos los datos necesarios (correo, nombre, viajes) para la prestación del servicio.\n2. Seguridad: Tus credenciales y datos viajan cifrados bajo estándares de alta seguridad.\n3. Derechos: Tienes control total sobre tu cuenta y puedes gestionar tus datos en cualquier momento.",
+      "Protegemos tu información:\n\n1. Recopilación: Solo recolectamos los datos necesarios (correo, nombre, viajes) para la prestación del servicio.\n2. Seguridad: Tus credenciales y datos viajan cifrados bajo estándares de alta seguridad.\n3. Derechos: Tienes control total sobre tu cuenta y puedes gestionar tus datos en cualquier momento.",
       [{ text: "Entendido", style: "default" }]
     );
   };
@@ -105,7 +105,7 @@ export default function PasajeroPreferenciasScreen() {
     {
       icono: "gift-outline",
       titulo: "Novedades y promociones",
-      descripcion: "Beneficios exclusivos, descuentos y noticias de Altokke.",
+      descripcion: "Beneficios exclusivos, descuentos y novedades para ti.",
       value: promociones,
       alCambiar: setPromociones,
     },
@@ -188,8 +188,8 @@ export default function PasajeroPreferenciasScreen() {
       }
 
       Alert.alert(
-        "¡Bienvenido a Altokke!",
-        "Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión con tus credenciales."
+        "¡Cuenta creada exitosamente!",
+        "Tu cuenta ha sido creada con éxito. Ya puedes iniciar sesión con tus credenciales."
       );
       clearRegistro();
       router.replace("/login");
