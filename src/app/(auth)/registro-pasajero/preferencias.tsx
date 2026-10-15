@@ -74,7 +74,7 @@ export default function PasajeroPreferenciasScreen() {
   const handleTerms = () => {
     Alert.alert(
       "Términos y Condiciones",
-      "1. Uso del Servicio: Nuestra plataforma conecta a usuarios con opciones de transporte y movilidad de forma segura.\n2. Cuentas y Responsabilidad: Eres responsable de la veracidad de los datos registrados y del resguardo de tu cuenta.\n3. Seguridad y Convivencia: Nos reservamos el derecho de suspender cuentas que infrinjan las normas de seguridad de la comunidad.",
+      "1. Mayoría de edad: Declaras bajo juramento ser mayor de 18 años y contar con plena capacidad para solicitar y pagar servicios de transporte.\n2. Uso responsable: Queda estrictamente prohibido realizar pedidos falsos, bromas o cancelaciones indebidas a los mototaxistas.\n3. Cuentas y Seguridad: Eres responsable de la veracidad de tus datos y del resguardo de tus credenciales.\n4. Sanciones: El mal uso del servicio conllevará el bloqueo permanente de la cuenta.",
       [{ text: "Entendido", style: "default" }]
     );
   };
@@ -124,7 +124,8 @@ export default function PasajeroPreferenciasScreen() {
       !datosPersonales.nombres ||
       !datosPersonales.apellidos ||
       !datosPersonales.telefono ||
-      !datosPersonales.dni
+      !datosPersonales.dni ||
+      !datosPersonales.fechaNacimiento
     ) {
       Alert.alert(
         "Datos incompletos",
@@ -149,6 +150,7 @@ export default function PasajeroPreferenciasScreen() {
             apellidos: datosPersonales.apellidos,
             telefono: datosPersonales.telefono,
             dni: datosPersonales.dni,
+            fecha_nacimiento: datosPersonales.fechaNacimiento,
             notificaciones,
             ubicacion,
             promociones,
@@ -203,6 +205,7 @@ export default function PasajeroPreferenciasScreen() {
             apellidos: datosPersonales.apellidos,
             telefono: datosPersonales.telefono,
             dni: datosPersonales.dni,
+            fecha_nacimiento: datosPersonales.fechaNacimiento,
             notificaciones,
             ubicacion,
             promociones,

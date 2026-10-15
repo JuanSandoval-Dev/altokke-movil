@@ -27,6 +27,7 @@ export default function PasajeroDatosPersonalesScreen() {
     defaultValues: {
       correo: datosPersonales.correo || "",
       contrasena: datosPersonales.contrasena || "",
+      confirmarContrasena: datosPersonales.confirmarContrasena || "",
     },
   });
 
@@ -39,7 +40,14 @@ export default function PasajeroDatosPersonalesScreen() {
     router.push("/registro-pasajero/verificacion");
   };
 
-  const onError = () => {
+  const onError = (errors: any) => {
+    if (errors?.confirmarContrasena) {
+      Alert.alert(
+        "Las contraseñas no coinciden",
+        "Por favor asegúrate de que ambas contraseñas sean idénticas."
+      );
+      return;
+    }
     Alert.alert(
       "Campos incompletos",
       "Por favor completa correctamente tu correo y una contraseña segura para continuar."
@@ -87,6 +95,16 @@ export default function PasajeroDatosPersonalesScreen() {
           />
           <MedidorPasswordSeguro contrasena={contrasenaActual} />
         </View>
+
+        <CampoTextoHookForm
+          control={control}
+          name="confirmarContrasena"
+          nombreIcono="shield-checkmark-outline"
+          placeholder="Confirmar contraseña"
+          esPassword
+          autoCapitalize="none"
+          textContentType="newPassword"
+        />
       </View>
 
       <View style={styles.bottomContainer}>
